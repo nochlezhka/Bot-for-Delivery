@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../libs/db/pickup-point"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
+}

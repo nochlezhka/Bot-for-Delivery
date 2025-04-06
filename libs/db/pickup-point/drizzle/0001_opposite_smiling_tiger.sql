@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "uniqueTgId" ON "user" USING btree ("tg_id");

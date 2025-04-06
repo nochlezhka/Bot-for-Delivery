@@ -1,0 +1,63 @@
+{
+  "name": "@flophouse/pp-bot",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "pp-bot",
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "webpack-cli build"
+        },
+        "configurations": {
+          "production": {
+            "args": [
+              "--node-env=production"
+            ]
+          },
+          "development": {
+            "args": [
+              "--node-env=development"
+            ]
+          }
+        }
+      },
+      "serve": {
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "pp-bot:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "pp-bot:build:development"
+          },
+          "production": {
+            "buildTarget": "pp-bot:build:production"
+          }
+        }
+      },
+      "ci": {
+        "dependsOn": ["build"],
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "load": true,
+          "push": true,
+          "metadata": {
+            "images": [
+              "ghcr.io/mvn-h24/flophouse/pp-bot"
+            ],
+            "tags": [
+              "type=ref,event=branch"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

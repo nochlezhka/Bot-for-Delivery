@@ -4,7 +4,13 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/flophouse"
+      "path": "./libs/db/pickup-point"
+    },
+    {
+      "path": "./apps/pp-mini-app"
+    },
+    {
+      "path": "./apps/pp-bot"
     }
   ]
 }

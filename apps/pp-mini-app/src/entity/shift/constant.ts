@@ -1,0 +1,1 @@
+export const SHIFT_ACCEPT_AVAILABLE_MS = 86400000;

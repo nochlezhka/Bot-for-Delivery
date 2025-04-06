@@ -1,0 +1,77 @@
+{
+  "name": "pickup-point-db",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "nx": {
+    "sourceRoot": "libs/db/pickup-point/src",
+    "targets": {
+      "build": {
+        "executor": "@nx/js:swc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "outputPath": "libs/db/pickup-point/dist",
+          "main": "libs/db/pickup-point/src/index.ts",
+          "tsConfig": "libs/db/pickup-point/tsconfig.lib.json",
+          "skipTypeCheck": true,
+          "stripLeadingPaths": true
+        }
+      },
+      "push": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "drizzle-kit push",
+          "cwd": "libs/db/pickup-point"
+        }
+      },
+      "generate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "drizzle-kit generate",
+          "cwd": "libs/db/pickup-point"
+        }
+      },
+      "migrate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "drizzle-kit migrate",
+          "cwd": "libs/db/pickup-point"
+        }
+      },
+      "ci": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "@nx-tools/nx-container:build",
+        "options": {
+          "load": true,
+          "push": true,
+          "metadata": {
+            "images": [
+              "ghcr.io/mvn-h24/flophouse/pickup-point-db"
+            ],
+            "tags": [
+              "type=ref,event=branch"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@swc/helpers": "~0.5.11"
+  }
+}

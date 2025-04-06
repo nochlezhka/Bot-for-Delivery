@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  pp-app-db:
+    image: postgres
+    restart: no
+    shm_size: 128mb
+    volumes:
+      - pp-app-db:/var/lib/postgresql/data
+    ports:
+      - "1233:5432"
+    env_file:
+      - .env.local
+    networks:
+      - pp-app
+
+volumes:
+  pp-app-db:
+    name: pp-app-db
+
+networks:
+  pp-app:
+    name: pp-app
+    external: false
