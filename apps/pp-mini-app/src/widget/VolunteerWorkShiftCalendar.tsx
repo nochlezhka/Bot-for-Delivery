@@ -1,14 +1,14 @@
 'use client';
 
-import { Modal } from '@telegram-apps/telegram-ui';
+import { Dialog, Portal } from '@ark-ui/react';
 import { useRef, useState } from 'react';
 
-import { VolunteerShift } from '@/entity/shift';
+import { VolunteerShift } from '@/entity/shift/types';
+import { VolunteerShiftControl } from '@/features/VolunteerShiftForm';
 import {
   VolunteerCalendar,
   VolunteerCalendarRef,
-  VolunteerShiftControl,
-} from '@/features';
+} from '@/features/VoulonteerCalendar';
 
 export function VolunteerWorkShiftCalendar() {
   const calendarRef = useRef<VolunteerCalendarRef>(null);
@@ -22,24 +22,35 @@ export function VolunteerWorkShiftCalendar() {
         onChangeValue={(value) => setSelectedShift(value)}
         onDateReset={() => setSelectedShift(null)}
       />
-      <Modal
+      <Dialog.Root
         open={selectedShift !== null}
-        onOpenChange={(open) => {
+        modal
+        lazyMount
+        unmountOnExit
+        onOpenChange={({ open }) => {
           if (!open) {
             calendarRef.current?.resetCalendar();
           }
         }}
-        className="px-4 py-6"
       >
-        {selectedShift === null ? (
-          <></>
-        ) : (
-          <VolunteerShiftControl
-            shift={selectedShift}
-            onActionComplete={() => calendarRef.current?.resetAndRefresh()}
-          />
-        )}
-      </Modal>
+        <Portal>
+          <Dialog.Positioner className="absolute z-10 flex justify-center items-center">
+            <Dialog.Content className="flex bg-[var(--tg-theme-bg-color)] p-5 rounded-lg">
+              {selectedShift === null ? (
+                <></>
+              ) : (
+                <VolunteerShiftControl
+                  shift={selectedShift}
+                  onActionComplete={() =>
+                    calendarRef.current?.resetAndRefresh()
+                  }
+                />
+              )}
+            </Dialog.Content>
+          </Dialog.Positioner>
+          <Dialog.Backdrop className="fixed size-full bg-black/50" />
+        </Portal>
+      </Dialog.Root>
     </>
   );
 }

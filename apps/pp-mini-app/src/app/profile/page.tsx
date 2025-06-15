@@ -1,5 +1,4 @@
 'use client';
-import { Avatar, Spinner } from '@telegram-apps/telegram-ui';
 import React, { useMemo } from 'react';
 
 import { api } from '@/trpc/client';
@@ -16,10 +15,14 @@ export default function ProfilePage() {
     [data]
   );
   return (
-    <div className="min-h-full w-full flex flex-col space-y-2 pt-1 px-1 relative">
+    <div className="min-h-full w-full flex flex-col space-y-2 px-1 relative">
       {data ? (
         <div className="flex items-start">
-          <Avatar size={96} />
+          <div className="avatar avatar-placeholder">
+            <div className="w-32 rounded-full avatar-placeholder bg-neutral text-neutral-content ">
+              <span className="text-xl">{data.name.slice(0, 3)}</span>
+            </div>
+          </div>
           <div className="ml-2 flex flex-col space-y-2">
             <p className="text-xl font-bold">{data.name}</p>
             <p className="text-[var(--tg-theme-subtitle-text-color)]">
@@ -36,7 +39,7 @@ export default function ProfilePage() {
         </div>
       ) : (
         <div className="absolute w-full h-full z-50 flex justify-center items-center bg-[var(--tg-theme-bg-color,white)]/90">
-          <Spinner size="l" />
+          <div className="loading loading-spinner loading-lg" />
         </div>
       )}
     </div>

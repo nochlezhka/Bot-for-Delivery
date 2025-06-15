@@ -1,11 +1,9 @@
-import { Select, Spinner } from '@telegram-apps/telegram-ui';
 import { HTMLProps } from 'react';
 
+import { ROLE_LIST, ROLE_NAMES } from '@/entity/employee/constant';
 import { Noop } from '@/shared/types';
 
 import type { UserRoles } from 'pickup-point-db';
-
-import { ROLE_LIST, ROLE_NAMES } from '../constant';
 
 interface RoleSelectProps extends Omit<HTMLProps<HTMLDivElement>, 'onChange'> {
   isLoading?: boolean;
@@ -19,21 +17,22 @@ export const RoleSelect = ({
   onChange,
 }: RoleSelectProps) => {
   return (
-    <Select
-      className="w-full"
-      disabled={isLoading}
-      before={isLoading ? <Spinner size="s" /> : null}
-      value={defaultSelected}
-      header="Роль"
-      onChange={(event) =>
-        onChange && onChange(event.currentTarget.value as UserRoles)
-      }
-    >
-      {ROLE_LIST.map((role) => (
-        <option key={role} value={role}>
-          {ROLE_NAMES[role]}
-        </option>
-      ))}
-    </Select>
+    <fieldset className="fieldset w-full">
+      <legend className="fieldset-legend">Роль</legend>
+      <select
+        className="select select-sm"
+        disabled={isLoading}
+        value={defaultSelected}
+        onChange={(event) =>
+          onChange && onChange(event.currentTarget.value as UserRoles)
+        }
+      >
+        {ROLE_LIST.map((role) => (
+          <option key={role} value={role}>
+            {ROLE_NAMES[role]}
+          </option>
+        ))}
+      </select>
+    </fieldset>
   );
 };

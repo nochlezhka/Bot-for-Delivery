@@ -1,18 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@telegram-apps/telegram-ui';
-import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import {
-  AcceptTimeout,
-  FreeNotice,
-  HalfBusyNotice,
-  isAcceptAvailable,
-  VolunteerShift,
-  volunteerShiftSchema,
-} from '@/entity/shift';
+import { volunteerShiftSchema } from '@/entity/shift/schema';
+import { VolunteerShift } from '@/entity/shift/types';
+import { AcceptTimeout } from '@/entity/shift/ui/AcceptTimeout';
+import { FreeNotice } from '@/entity/shift/ui/FreeNotice';
+import { HalfBusyNotice } from '@/entity/shift/ui/HalfBusyNotice';
+import { isAcceptAvailable } from '@/entity/shift/util';
 import { Noop } from '@/shared/types';
 import { api } from '@/trpc/client';
 
@@ -101,21 +97,28 @@ export const VolunteerShiftControl = ({
           let result = <></>;
           if (field.value === undefined || field.value === null) {
             result = (
-              <Button size="m" type="submit" className="mt-6">
+              <button className="btn btn-md btn-primary mt-6" type="submit">
                 Записаться
-              </Button>
+              </button>
             );
           } else if (field.value === false) {
             result = (
               <div className="mt-6 flex flex-col">
                 {isAcceptAvailable(form.getValues('dateStart')) ? (
-                  <Button size="m" type="submit" className="!mb-2">
+                  <button
+                    className="btn btn-md btn-primary !mb-2"
+                    type="submit"
+                  >
                     Подтвердить
-                  </Button>
+                  </button>
                 ) : null}
-                <Button size="m" type="button" onClick={cancelAction}>
+                <button
+                  className="btn btn-md btn-primary"
+                  type="button"
+                  onClick={cancelAction}
+                >
                   Отменить
-                </Button>
+                </button>
               </div>
             );
           }

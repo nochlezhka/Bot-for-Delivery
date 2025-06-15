@@ -1,5 +1,4 @@
 'use client';
-import { Chip, Radio } from '@telegram-apps/telegram-ui';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
 
@@ -27,21 +26,16 @@ export const RoleChips = ({
   return (
     <div className={clsx(className, 'flex flex-wrap gap-2 h-min')}>
       {ROLE_LIST.map((val) => (
-        <Chip
-          key={val}
-          mode="elevated"
-          Component="label"
-          before={
-            <Radio
-              name="role"
-              value={val}
-              defaultChecked={val === defaultSelected}
-              onChange={selectAciton.bind(null, val)}
-            />
-          }
-        >
+        <label className="badge badge-primary gap-1 cursor-pointer" key={val}>
+          <input
+            type="radio"
+            value={val}
+            defaultChecked={val === defaultSelected}
+            onChange={selectAciton.bind(null, val)}
+            name="role"
+          />
           {ROLE_NAMES[val]}
-        </Chip>
+        </label>
       ))}
     </div>
   );

@@ -1,12 +1,12 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { List, Spinner } from '@telegram-apps/telegram-ui';
 import { getQueryKey } from '@trpc/react-query';
 import { CircleAlert } from 'lucide-react';
 import { UserRoles } from 'pickup-point-db';
 import React, { useState } from 'react';
 
-import { RoleChips, RoleSelect } from '@/entity/employee';
+import { RoleChips } from '@/entity/employee/ui/RoleChips';
+import { RoleSelect } from '@/entity/employee/ui/RoleSelect';
 import { api, RouterOutputs } from '@/trpc/client';
 
 const DEFAULT_SELECTED = 'volunteer';
@@ -21,19 +21,23 @@ const UserCard = ({
   onChange: Parameters<typeof RoleSelect>[0]['onChange'];
 }) => {
   return (
-    <div className="w-full grow flex flex-col items-start rounded-md border border-[var(--tgui--secondary_fill)] overflow-hidden pt-2">
-      <div className="px-5 flex flex-col">
-        <h2>{user.name}</h2>
-        <span>{user.gender === 'male' ? 'Мужчина' : 'Женщина'}</span>
-        <span>{user.phone}</span>
-        <span>{user.tgUsername ?? user.tgId.toString()}</span>
-      </div>
+    <div className="card card-xs card-border shadow-sm">
+      <div className="card-body">
+        <h2 className="card-title">{user.name}</h2>
+        <div className="flex flex-col space-y-2">
+          <span>{user.gender === 'male' ? 'Мужчина' : 'Женщина'}</span>
+          <span>{user.phone}</span>
+          <span>{user.tgUsername ?? user.tgId.toString()}</span>
+        </div>
 
-      <RoleSelect
-        isLoading={isLoading}
-        defaultSelected={user.role}
-        onChange={onChange}
-      />
+        <div className="card-actions">
+          <RoleSelect
+            isLoading={isLoading}
+            defaultSelected={user.role}
+            onChange={onChange}
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -56,16 +60,12 @@ export default function UsersPage() {
     <div className="flex flex-col relative">
       {isRefetching || isLoading ? (
         <div className="absolute w-full h-full z-50 flex justify-center items-center bg-[var(--tg-theme-bg-color,white)]/90">
-          <Spinner size="l" />
+          <div className="loading loading-spinner loading-lg" />
         </div>
       ) : (
         <></>
       )}
-      <RoleChips
-        className="mt-2"
-        defaultSelected={DEFAULT_SELECTED}
-        onChange={setCurrentRole}
-      />
+      <RoleChips defaultSelected={DEFAULT_SELECTED} onChange={setCurrentRole} />
       <div className="h-full flex flex-grow mt-2">
         {(() => {
           let result = <></>;
@@ -79,7 +79,7 @@ export default function UsersPage() {
               );
             } else {
               result = (
-                <List className="w-full grow">
+                <div className="w-full grow flex flex-col gap-2">
                   {data.map((user) => (
                     <UserCard
                       key={user.id}
@@ -104,7 +104,7 @@ export default function UsersPage() {
                       }}
                     />
                   ))}
-                </List>
+                </div>
               );
             }
           }

@@ -1,5 +1,5 @@
-import { SelectedShifts } from '@/features';
+import { SelectedShifts } from '@/features/SelectedShifts';
 
 export default function PlannedPage() {
-  return <SelectedShifts className=" mt-2 pb-5" />;
+  return <SelectedShifts className="pb-5" />;
 }

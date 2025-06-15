@@ -1,6 +1,5 @@
 import { DatePicker, useDatePicker, UseDatePickerReturn } from '@ark-ui/react';
 import { CalendarDate, fromDate, now } from '@internationalized/date';
-import { Button, IconButton } from '@telegram-apps/telegram-ui';
 import { ValueChangeDetails } from '@zag-js/date-picker';
 import { clsx } from 'clsx';
 import { startOfDay } from 'date-fns/startOfDay';
@@ -25,19 +24,15 @@ export const TelegramCalendar = ({
       <DatePicker.Content className="flex flex-col">
         <div className="flex flex-col">
           <div className="grid grid-cols-[auto_1fr_auto] justify-items-center items-center">
-            <DatePicker.PrevTrigger asChild>
-              <IconButton size="l">
-                <ChevronLeftIcon />
-              </IconButton>
+            <DatePicker.PrevTrigger className="btn btn-info btn-square">
+              <ChevronLeftIcon />
             </DatePicker.PrevTrigger>
             <span>
               {datepicker.visibleRangeText.start[0].toUpperCase()}
               {datepicker.visibleRangeText.start.slice(1)}
             </span>
-            <DatePicker.NextTrigger asChild>
-              <IconButton size="l">
-                <ChevronRightIcon />
-              </IconButton>
+            <DatePicker.NextTrigger className="btn btn-info btn-square">
+              <ChevronRightIcon />
             </DatePicker.NextTrigger>
           </div>
           <DatePicker.Table className="flex flex-col mt-7 w-full">
@@ -77,24 +72,23 @@ export const TelegramCalendar = ({
                         value={day}
                         className="flex aspect-square"
                       >
-                        <Button
-                          mode={_isHightlited ? 'filled' : 'outline'}
+                        <button
                           disabled={isDisabled}
-                          stretched
                           onClick={() => {
                             datepicker.setValue([day as CalendarDate]);
                           }}
                           className={clsx(
-                            '!h-full px-[6px] py-0.5 flex justify-end items-end text-xl overflow-hidden',
+                            'btn btn-wide !h-full px-[6px] py-0.5 flex justify-end items-end text-xl overflow-hidden',
+                            isDisabled ? 'btn-dash' : null,
                             _isWarrning
                               ? _isHightlited
-                                ? '!bg-red-400'
-                                : '!shadow-[0_0_0_1px_red] !bg-red-900'
+                                ? 'btn-error'
+                                : 'btn-warning'
                               : null
                           )}
                         >
                           {day.day.toString()}
-                        </Button>
+                        </button>
                       </DatePicker.TableCell>
                     );
                   })}

@@ -1,11 +1,7 @@
 'use client';
 
-import { VolunteerWorkShiftCalendar } from '@/widget';
+import { VolunteerWorkShiftCalendar } from '@/widget/VolunteerWorkShiftCalendar';
 
 export default function Home() {
-  return (
-    <div className="flex flex-col mt-5">
-      <VolunteerWorkShiftCalendar />
-    </div>
-  );
+  return <VolunteerWorkShiftCalendar />;
 }

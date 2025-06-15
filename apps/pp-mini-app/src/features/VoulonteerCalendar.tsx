@@ -5,15 +5,15 @@ import { endOfMonth } from 'date-fns/endOfMonth';
 import { forwardRef, useImperativeHandle, useMemo } from 'react';
 import { pick } from 'remeda';
 
+import { VolunteerShift } from '@/entity/shift/types';
 import {
   castShiftDateTime,
   createWarningBorder,
   isAcceptAvailable,
   shiftKeyByDate,
-  VolunteerShift,
-} from '@/entity/shift';
+} from '@/entity/shift/util';
 import { Noop } from '@/shared/types';
-import { TelegramCalendar } from '@/shared/ui';
+import { TelegramCalendar } from '@/shared/ui/TelegramCalendar';
 import { api } from '@/trpc/client';
 
 interface VolunteerCalendarProps {

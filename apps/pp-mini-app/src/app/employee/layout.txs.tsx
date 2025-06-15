@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai/react';
 import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect } from 'react';
 
-import { isEmployeeAtom } from '@/entity/employee';
+import { isEmployeeAtom } from '@/entity/employee/state';
 
 export default function EmployeeLayout({ children }: PropsWithChildren) {
   const isEmployee = useAtomValue(isEmployeeAtom);

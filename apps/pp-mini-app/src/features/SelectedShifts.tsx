@@ -1,18 +1,14 @@
 'use client';
 
-import { Button } from '@telegram-apps/telegram-ui';
 import { clsx } from 'clsx';
 import { compareAsc } from 'date-fns/compareAsc';
 import { format } from 'date-fns/format';
 import { ru } from 'date-fns/locale/ru';
 import React, { HTMLProps } from 'react';
 
-import {
-  AcceptTimeout,
-  createWarningBorder,
-  HalfBusyNotice,
-  isAcceptAvailable,
-} from '@/entity/shift';
+import { AcceptTimeout } from '@/entity/shift/ui/AcceptTimeout';
+import { HalfBusyNotice } from '@/entity/shift/ui/HalfBusyNotice';
+import { createWarningBorder, isAcceptAvailable } from '@/entity/shift/util';
 import { api } from '@/trpc/client';
 
 type SelectedShiftsProps = HTMLProps<HTMLDivElement>;
@@ -39,32 +35,50 @@ export const SelectedShifts = ({ className }: SelectedShiftsProps) => {
         return (
           <div
             className={clsx(
-              'w-full grow flex flex-col items-start rounded-md border-2 border-[var(--tgui--secondary_fill)] overflow-hidden p-2',
-              isHalfBusy ? 'bg-red-900 !border-[red]' : null
+              'card card-xs card-border shadow-sm',
+              isHalfBusy ? 'bg-red-900' : null
             )}
             key={shiftId}
           >
-            {res.at(0)?.toUpperCase() + res.slice(1)}
-            {isHalfBusy ? <HalfBusyNotice className="mb-2" /> : null}
-            {
-              <AcceptTimeout
-                dateStart={shift.dateStart}
-                isAccepted={shift.accepted}
-              />
-            }
-            {shift.accepted === false ? (
-              <div className="grid grid-flow-col auto-cols-[min-content] gap-2 mt-6">
-                {isAcceptAvailable(shift.dateStart) ? (
-                  <Button size="m" onClick={() => acceptShift({ id: shiftId })}>
-                    Подтвердить
-                  </Button>
-                ) : null}
-
-                <Button size="m" onClick={() => cancelShift({ id: shiftId })}>
-                  Отменить
-                </Button>
+            <div className="card-body">
+              <div className="card-title">
+                {res.at(0)?.toUpperCase() + res.slice(1)}
               </div>
-            ) : null}
+              {isHalfBusy ? <HalfBusyNotice className="mb-2" /> : <></>}
+              <p>
+                {
+                  <AcceptTimeout
+                    dateStart={shift.dateStart}
+                    isAccepted={shift.accepted}
+                  />
+                }
+              </p>
+              <div className="card-actions">
+                {shift.accepted === false ? (
+                  <>
+                    {isAcceptAvailable(shift.dateStart) ? (
+                      <button
+                        className="btn btn-sm"
+                        onClick={() => acceptShift({ id: shiftId })}
+                      >
+                        Подтвердить
+                      </button>
+                    ) : (
+                      <></>
+                    )}
+
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => cancelShift({ id: shiftId })}
+                    >
+                      Отменить
+                    </button>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+            </div>
           </div>
         );
       })}

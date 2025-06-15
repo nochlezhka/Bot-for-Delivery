@@ -12,8 +12,9 @@ import { WelcomeScene } from './modules/welcome/welcome.scene';
     ConfigModule.forRoot(),
     TelegrafModule.forRootAsync(TelegrafConfig),
     WelcomeScene,
-    DrizzleModule,
+    DrizzleModule
   ],
-  providers: [AppUpdate],
+  providers: [AppUpdate]
 })
-export class AppModule {}
+export class AppModule {
+}

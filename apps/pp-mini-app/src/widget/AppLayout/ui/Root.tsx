@@ -1,10 +1,10 @@
 'use client';
 
 import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
-import { AppRoot } from '@telegram-apps/telegram-ui';
 import { type PropsWithChildren } from 'react';
 
-import { ErrorBoundary, ErrorPage, Loader } from '@/shared/ui';
+import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
+import { ErrorPage } from '@/shared/ui/ErrorPage';
 import { TRPCProvider } from '@/trpc/client';
 
 import { AppView } from './AppView';
@@ -20,16 +20,7 @@ function RootInner({ children }: PropsWithChildren) {
   useClientOnce(() => {
     init(debug);
   });
-  return (
-    <AppRoot
-      className="w-full bg-[var(--tg-theme-bg-color,white)]"
-      platform={
-        ['macos', 'ios'].includes(lp.platform as string) ? 'ios' : 'base'
-      }
-    >
-      <AppView>{children}</AppView>
-    </AppRoot>
-  );
+  return <AppView>{children}</AppView>;
 }
 
 export function AppLayout(props: PropsWithChildren) {
@@ -46,8 +37,8 @@ export function AppLayout(props: PropsWithChildren) {
       </TRPCProvider>
     </ErrorBoundary>
   ) : (
-    <div className="flex m-auto">
-      <Loader />
+    <div className="flex justify-center">
+      <div className="loading loading-spinner loading-lg" />
     </div>
   );
 }

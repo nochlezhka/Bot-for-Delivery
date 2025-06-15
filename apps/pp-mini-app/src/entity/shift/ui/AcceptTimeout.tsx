@@ -1,6 +1,4 @@
-import { Subheadline } from '@telegram-apps/telegram-ui';
 import { Info } from 'lucide-react';
-import React from 'react';
 
 import { ShiftTimer } from './ShiftTimer';
 import { acceptAvailableDate, isAcceptAvailable } from '../util';
@@ -18,9 +16,7 @@ export const AcceptTimeout = ({
   if (isAccepted || typeof isAccepted !== 'boolean') {
     result = (
       <div className="flex flex-col">
-        <Subheadline className="!mb-1" level="1" weight="1">
-          До смены осталось:
-        </Subheadline>
+        <span className="!mb-1">До смены осталось:</span>
         <ShiftTimer date={dateStart} />
       </div>
     );
@@ -28,9 +24,7 @@ export const AcceptTimeout = ({
     if (isAcceptAvailable(dateStart)) {
       result = (
         <div className="flex flex-col">
-          <Subheadline className="!mb-1" level="1" weight="1">
-            До смены осталось:
-          </Subheadline>
+          <span className="!mb-1">До смены осталось:</span>
           <ShiftTimer date={dateStart} />
           <div className="flex items-center mt-2">
             <Info size={16} />
@@ -41,9 +35,9 @@ export const AcceptTimeout = ({
     } else {
       result = (
         <div className="flex flex-col">
-          <Subheadline className="!mr-1" level="1" weight="1">
+          <span className="!mr-1">
             Подтверждение смены станет доступным через:
-          </Subheadline>
+          </span>
           <ShiftTimer date={acceptAvailableDate(dateStart)} />
         </div>
       );

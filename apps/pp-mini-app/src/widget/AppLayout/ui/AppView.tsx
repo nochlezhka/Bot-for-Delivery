@@ -2,8 +2,7 @@
 
 import { PropsWithChildren } from 'react';
 
-import { RegisterForm } from '@/features';
-import { Loader } from '@/shared/ui';
+import { RegisterForm } from '@/features/RegisterForm';
 import { api } from '@/trpc/client';
 
 import { AuthenticatedView } from './AuthenticatedView';
@@ -19,8 +18,8 @@ export const AppView = ({ children }: PropsWithChildren) => {
     await refreshProfile();
   };
   let result = (
-    <div className="flex m-auto">
-      <Loader />
+    <div className="flex justify-center">
+      <div className="loading loading-spinner loading-lg" />
     </div>
   );
   if (!isLoading) {
