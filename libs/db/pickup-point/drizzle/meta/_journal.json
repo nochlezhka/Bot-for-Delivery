@@ -57,6 +57,13 @@
       "when": 1753398831410,
       "tag": "0007_good_maginty",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1753568365777,
+      "tag": "0008_fluffy_penance",
+      "breakpoints": true
     }
   ]
 }

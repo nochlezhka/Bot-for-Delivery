@@ -68,6 +68,9 @@ export const userShiftsTable = pgTable(
       .references(() => shiftTable.id)
       .notNull(),
     status: boolean('status'),
+    confirmationRequestSent: boolean('confirmation_request_sent')
+      .default(false)
+      .notNull(),
   },
   (t) => [
     primaryKey({
