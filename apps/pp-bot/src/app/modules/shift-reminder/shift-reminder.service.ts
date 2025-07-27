@@ -7,7 +7,7 @@ import { Drizzle } from '../../drizzle';
 import { schema } from 'pickup-point-db';
 import { and, eq, lt, gt, InferSelectModel } from 'drizzle-orm';
 
-import { confirmShift, declineShift } from './constant';
+import { confirmShift, cronSchedule, declineShift } from './constant';
 
 @Injectable()
 export class ShiftReminderService {
@@ -16,7 +16,7 @@ export class ShiftReminderService {
 
   constructor(@InjectBot() private readonly bot: Telegraf) {}
 
-  @Cron('*/1 * * * *') // every 15 minutes
+  @Cron(cronSchedule)
   async handleEventReminders() {
     const now = new Date();
     const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
