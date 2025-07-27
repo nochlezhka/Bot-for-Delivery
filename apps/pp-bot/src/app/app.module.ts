@@ -4,11 +4,11 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { AppUpdate } from './app.update';
-import { ShiftUpdate } from './shift.update';
 import { TelegrafConfig } from './config';
 import { DrizzleModule } from './drizzle';
 import { WelcomeScene } from './modules/welcome/welcome.scene';
-import { ReminderService } from './reminder.service';
+import { ShiftReminderService } from './modules/shift-reminder/shift-reminder.service';
+import { ShiftUpdate } from './modules/shift-reminder/shift.update';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { ReminderService } from './reminder.service';
     WelcomeScene,
     DrizzleModule
   ],
-  providers: [AppUpdate, ReminderService, ShiftUpdate],
+  providers: [AppUpdate, ShiftReminderService, ShiftUpdate],
 })
 export class AppModule {
 }

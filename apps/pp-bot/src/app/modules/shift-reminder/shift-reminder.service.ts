@@ -3,14 +3,16 @@ import { Cron } from '@nestjs/schedule';
 import { InjectBot } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import { Inject } from '@nestjs/common';
-import { Drizzle } from './drizzle';
+import { Drizzle } from '../../drizzle';
 import { schema } from 'pickup-point-db';
 import { and, eq, lt, gt, InferSelectModel } from 'drizzle-orm';
 
+import { confirmShift, declineShift } from './constant';
+
 @Injectable()
-export class ReminderService {
+export class ShiftReminderService {
   @Inject() private readonly drizzle!: Drizzle;
-  private readonly logger = new Logger(ReminderService.name);
+  private readonly logger = new Logger(ShiftReminderService.name);
 
   constructor(@InjectBot() private readonly bot: Telegraf) {}
 
@@ -52,19 +54,9 @@ export class ReminderService {
       for (const userShift of shift.userShifts) {
         if (!userShift.user) continue;
 
-        const msg = `Напоминаю вам о смене ${shift.title}, начинающейся в ${new Date(shift.dateStart).toLocaleString()}, на которую вы записаны`;
         try {
-          await this.bot.telegram.sendMessage(userShift.user.tgId.toString(), msg, {
-            reply_markup: {
-              inline_keyboard: [
-                [
-                  { text: '✅ Подтвердить', callback_data: `confirm_shift:${shift.id}` },
-                  { text: '❌ Отменить', callback_data: `reject_shift:${shift.id}` },
-                ],
-              ],
-            },
-          });
-
+          await this.sendShiftReminder(userShift.user.tgId.toString(), shift);
+          await this.setConfirmationRequestSent(userShift.userId, shift.id);
           this.logger.log(`Sent reminder to ${userShift.user.tgId.toString()}`);
         } catch (err) {
           if (err instanceof Error) {
@@ -75,5 +67,31 @@ export class ReminderService {
         }
       }
     }
+  }
+
+  async sendShiftReminder(userTgId: string, shift: InferSelectModel<typeof schema.shiftTable>) {
+    const msg = `Напоминаю вам о смене ${shift.title}, начинающейся в ${new Date(shift.dateStart).toLocaleString()}, на которую вы записаны`;
+    await this.bot.telegram.sendMessage(userTgId, msg, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '✅ Подтвердить', callback_data: `${confirmShift}:${shift.id}` },
+            { text: '❌ Отменить', callback_data: `${declineShift}:${shift.id}` },
+          ],
+        ],
+      },
+    });
+  }
+
+  async setConfirmationRequestSent(userId: string, shiftId: string) {
+    this.logger.debug(`Setting confirmation request sent for user ${userId} and shift ${shiftId}`);
+    await this.drizzle.db.update(schema.userShiftsTable)
+      .set({ confirmationRequestSent: true })
+      .where(
+        and(
+          eq(schema.userShiftsTable.userId, userId),
+          eq(schema.userShiftsTable.shiftId, shiftId)
+        )
+      );
   }
 }

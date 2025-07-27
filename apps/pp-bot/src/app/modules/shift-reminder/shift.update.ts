@@ -1,11 +1,14 @@
-import { Inject, Logger, Param } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 import { and, eq } from 'drizzle-orm';
 
 import { schema } from 'pickup-point-db';
 
-import { Drizzle } from './drizzle';
+import { Drizzle } from '../../drizzle';
+
+import { shiftActionsPattern } from './constant';
+import { ShiftAction } from './type';
 
 
 @Update()
@@ -13,7 +16,7 @@ export class ShiftUpdate {
   @Inject() private readonly drizzle!: Drizzle;
   private readonly logger = new Logger(ShiftUpdate.name);
 
-  @Action(/^(confirm|reject)_shift:(.+)$/)
+  @Action(new RegExp(`^(${shiftActionsPattern})_shift:(.+)$`))
   async handleShiftAction(@Ctx() ctx: Context) {
     const cbq = ctx.callbackQuery;
 
@@ -23,14 +26,14 @@ export class ShiftUpdate {
     }
 
     const data = cbq.data; // e.g., "confirm_shift:UUID"
-    const match = data.match(/^(confirm|reject)_shift:(.+)$/);
+    const match = data.match(new RegExp(`^(${shiftActionsPattern})_shift:(.+)$`));
 
     if (!match) {
       this.logger.warn(`Callback data didn't match expected pattern: ${data}`);
       return;
     }
 
-    const action = match[1]; // "confirm" or "decline"
+    const action = match[1] as ShiftAction; // "confirm" or "decline"
     const shiftId = match[2]; // the UUID
 
     this.logger.debug(`Action: ${action}, Shift ID: ${shiftId}`);
@@ -71,15 +74,17 @@ export class ShiftUpdate {
         )
       );
 
-    if (action === 'confirm') {
-      // process confirmation
-      await ctx.reply(`✅ Смена ${shift.dateStart} подтверждена. Спасибо за вашу помощь!`);
-    } else if (action === 'decline') {
-      // process decline
-      await ctx.reply('❌ Смена отклонена. Спасибо за уведомление! Мы сообщим координаторам.');
+    switch (action) {
+      case ShiftAction.Confirm:
+        await ctx.reply(`✅ Смена ${shift.dateStart.toDateString()} подтверждена. Спасибо за вашу помощь!`);
+        break;
+      case ShiftAction.Decline:
+        await ctx.reply(`❌ Смена ${shift.dateStart.toDateString()} отклонена. Спасибо за уведомление! Мы сообщим координаторам.`);
+        break;
+      default:
+        this.logger.warn(`Unhandled action: ${action}`);
     }
     await ctx.editMessageReplyMarkup(undefined); // removes the buttons
-
     await ctx.answerCbQuery('✅ Действие выполнено');
   }
 }
