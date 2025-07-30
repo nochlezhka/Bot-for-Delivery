@@ -1,0 +1,1 @@
+ALTER TABLE "user_shifts_table" ADD COLUMN "confirmation_request_sent" boolean DEFAULT false NOT NULL;

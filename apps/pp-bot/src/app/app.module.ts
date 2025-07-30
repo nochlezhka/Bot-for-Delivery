@@ -1,20 +1,27 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { CqrsModule } from '@nestjs/cqrs';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TelegrafModule } from 'nestjs-telegraf';
 
 import { AppUpdate } from './app.update';
+import { SendConfirmCommandHandler } from './commands';
 import { TelegrafConfig } from './config';
 import { DrizzleModule } from './drizzle';
-import { WelcomeScene } from './modules/welcome/welcome.scene';
+import { ShiftConfirmModule } from './modules/shift-confirm';
+import { WelcomeModule } from './modules/welcome';
 
 @Module({
   imports: [
+    CqrsModule.forRoot(),
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TelegrafModule.forRootAsync(TelegrafConfig),
-    WelcomeScene,
-    DrizzleModule
+    DrizzleModule,
+
+    WelcomeModule,
+    ShiftConfirmModule,
   ],
-  providers: [AppUpdate]
+  providers: [AppUpdate, SendConfirmCommandHandler, Logger],
 })
-export class AppModule {
-}
+export class AppModule {}

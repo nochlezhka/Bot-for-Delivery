@@ -23,7 +23,7 @@ export const userRoleEnum = pgEnum('user_role', [
 ]);
 export const userGender = pgEnum('user_gender', ['male', 'female']);
 export const userTable = pgTable(
-  'user',
+  'users',
   {
     id: uuid('id')
       .primaryKey()
@@ -68,6 +68,9 @@ export const userShiftsTable = pgTable(
       .references(() => shiftTable.id)
       .notNull(),
     status: boolean('status'),
+    confirmationRequestSent: boolean('confirmation_request_sent')
+      .default(false)
+      .notNull(),
   },
   (t) => [
     primaryKey({
@@ -76,6 +79,12 @@ export const userShiftsTable = pgTable(
     }),
   ]
 );
+
+// shift -> userShifts
+export const shiftRelations = relations(shiftTable, ({ many }) => ({
+  userShifts: many(userShiftsTable),
+}));
+
 
 export const userShiftsRelations = relations(userShiftsTable, ({ one }) => ({
   shift: one(shiftTable, {
