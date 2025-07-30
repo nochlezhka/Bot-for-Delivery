@@ -12,6 +12,7 @@
     "@nestjs/common": "^10.0.2",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.0.2",
+    "@nestjs/cqrs": "^11.0.3",
     "@nestjs/schedule": "^6.0.0",
     "@tanstack/react-query": "^5.71.10",
     "@telegram-apps/init-data-node": "^2.0.3",
