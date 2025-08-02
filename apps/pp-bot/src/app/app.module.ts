@@ -10,6 +10,7 @@ import { TelegrafConfig } from './config';
 import { DrizzleModule } from './drizzle';
 import { ShiftConfirmModule } from './modules/shift-confirm';
 import { WelcomeModule } from './modules/welcome';
+import { RpcModule } from './modules/rpc';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { WelcomeModule } from './modules/welcome';
 
     WelcomeModule,
     ShiftConfirmModule,
+    RpcModule,
   ],
   providers: [AppUpdate, SendConfirmCommandHandler, Logger],
 })

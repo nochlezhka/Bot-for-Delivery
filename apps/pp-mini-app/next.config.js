@@ -10,6 +10,14 @@ const nextConfig = {
     svgr: false,
   },
   output: 'standalone',
+  webpack(config) {
+    config.resolve.fallback = {
+      ...(config.resolve.fallback || {}),
+      '@grpc/proto-loader': false,
+      '@grpc/grpc-js': false,
+    };
+    return config;
+  },
 };
 
 const plugins = [
