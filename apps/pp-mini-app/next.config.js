@@ -9,6 +9,9 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
+  experimental: {
+    instrumentationHook: true,
+  },
   output: 'standalone',
   webpack(config) {
     config.resolve.fallback = {

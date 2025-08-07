@@ -1,10 +1,16 @@
+import { firstValueFrom } from 'rxjs';
+
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc';
-// noinspection ES6UnusedImports
-import { rpcPing } from '@/server/rmq';
-// const rpcPing = () => Promise.resolve('[]');
+import { rmqClient } from '@/server/rmq';
+
 export const rpcRouter = createTRPCRouter({
   ping: publicProcedure.query(async () => {
-    const res = await rpcPing();
+    const pattern = 'ping';
+    const payload = {};
+
+    const res = await firstValueFrom(
+      rmqClient.send<string, object>(pattern, payload)
+    );
     return { res };
   }),
 });
