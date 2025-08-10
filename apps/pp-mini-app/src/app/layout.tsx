@@ -1,9 +1,10 @@
+import './_assets/globals.css';
+
+import { ToastContainer } from '@/shared/ui/Toaster';
 import { AppLayout } from '@/widget/AppLayout';
 
 import type { Metadata } from 'next';
 import type { PropsWithChildren } from 'react';
-
-import './_assets/globals.css';
 
 export const metadata: Metadata = {
   title: 'Ночлежка. Пункт выдачи',
@@ -15,6 +16,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
     <html lang="ru" className="select-none">
       <body>
         <AppLayout>{children}</AppLayout>
+        <ToastContainer />
       </body>
     </html>
   );
