@@ -8,40 +8,46 @@ interface AcceptTimeoutProps {
   dateStart: Date;
 }
 
+const getStartMs = (dateStart: Date) =>
+  dateStart.getTime() - new Date().getTime();
+
 export const AcceptTimeout = ({
   isAccepted,
   dateStart,
 }: AcceptTimeoutProps) => {
   let result = <></>;
+
   if (isAccepted || typeof isAccepted !== 'boolean') {
     result = (
-      <div className="flex flex-col">
-        <span className="!mb-1">До смены осталось:</span>
-        <ShiftTimer date={dateStart} />
-      </div>
+      <>
+        <span>До смены осталось:</span>
+        <ShiftTimer className="mt-1" startMs={getStartMs(dateStart)} />;
+      </>
     );
   } else {
     if (isAcceptAvailable(dateStart)) {
       result = (
-        <div className="flex flex-col">
-          <span className="!mb-1">До смены осталось:</span>
-          <ShiftTimer date={dateStart} />
-          <div className="flex items-center mt-2">
+        <>
+          <span>До смены осталось:</span>
+          <ShiftTimer className="mt-1" startMs={getStartMs(dateStart)} />
+          <div className="flex items-center mt-1">
             <Info size={16} />
             <p className="ml-1">Пожалуйста, подтвердите смену</p>
           </div>
-        </div>
+        </>
       );
     } else {
       result = (
-        <div className="flex flex-col">
-          <span className="!mr-1">
-            Подтверждение смены станет доступным через:
-          </span>
-          <ShiftTimer date={acceptAvailableDate(dateStart)} />
-        </div>
+        <>
+          <span>Подтверждение смены станет доступным через:</span>
+          <ShiftTimer
+            className="mt-1"
+            startMs={getStartMs(acceptAvailableDate(dateStart))}
+          />
+        </>
       );
     }
   }
-  return result;
+
+  return <div className="flex flex-col">{result}</div>;
 };
