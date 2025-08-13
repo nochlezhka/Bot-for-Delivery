@@ -21,7 +21,7 @@ export const AcceptTimeout = ({
     result = (
       <>
         <span>До смены осталось:</span>
-        <ShiftTimer className="mt-1" startMs={getStartMs(dateStart)} />;
+        <ShiftTimer className="mt-1" startMs={getStartMs(dateStart)} />
       </>
     );
   } else {

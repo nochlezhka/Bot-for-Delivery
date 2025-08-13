@@ -1,6 +1,6 @@
 import { clsx } from 'clsx';
 import { OctagonAlert } from 'lucide-react';
-import React, { HTMLProps } from 'react';
+import { HTMLProps } from 'react';
 
 type HalfBusyNoticeProps = HTMLProps<HTMLDivElement>;
 

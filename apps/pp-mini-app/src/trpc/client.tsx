@@ -6,7 +6,7 @@ import { createTRPCReact } from '@trpc/react-query';
 import { Provider } from 'jotai/react';
 import { useHydrateAtoms } from 'jotai/utils';
 import { queryClientAtom } from 'jotai-tanstack-query';
-import React, { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import superjson from 'superjson';
 
 import { type AppRouter } from '@/server/api/root';

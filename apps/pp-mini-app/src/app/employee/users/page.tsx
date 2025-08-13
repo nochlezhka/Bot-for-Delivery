@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getQueryKey } from '@trpc/react-query';
 import { CircleAlert } from 'lucide-react';
 import { UserRoles } from 'pickup-point-db';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { RoleChips } from '@/entity/employee/ui/RoleChips';
 import { RoleSelect } from '@/entity/employee/ui/RoleSelect';

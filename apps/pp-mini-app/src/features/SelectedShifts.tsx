@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { compareAsc } from 'date-fns/compareAsc';
 import { format } from 'date-fns/format';
 import { ru } from 'date-fns/locale/ru';
-import React, { HTMLProps } from 'react';
+import { HTMLProps } from 'react';
 
 import { AcceptTimeout } from '@/entity/shift/ui/AcceptTimeout';
 import { HalfBusyNotice } from '@/entity/shift/ui/HalfBusyNotice';
