@@ -35,6 +35,8 @@ export const VolunteerCalendar = forwardRef<
   { onChangeValue, onDateReset }: VolunteerCalendarProps,
   ref
 ) {
+  const { data: userProfile } = api.user.profile.useQuery();
+
   const { dateRange, resetCalendar, datePicker } =
     TelegramCalendar.useDatepicker({
       onChangeValue: (date) => {
@@ -48,20 +50,25 @@ export const VolunteerCalendar = forwardRef<
       onDateReset,
       maxDate: endOfMonth(addMonths(new Date(), 1)),
       isDateUnavailable: (date: Date) => {
-        let result = false;
-        const shift = calendarShiftMap.get(shiftKeyByDate(date));
-        if (shift) {
-          if (shift.status === 'weekend') {
-            result = true;
+        let isUnavailable =
+          userProfile?.gender === 'male' && date.getDay() === 4;
+
+        if (!isUnavailable) {
+          const shift = calendarShiftMap.get(shiftKeyByDate(date));
+          if (shift) {
+            isUnavailable =
+              shift.status === 'weekend' ||
+              !(
+                shift.status === 'free' ||
+                shift.status === 'halfBusy' ||
+                (shift.status === 'busy' && typeof shift.accepted === 'boolean')
+              );
           } else {
-            result = !(
-              shift.status === 'free' ||
-              shift.status === 'halfBusy' ||
-              (shift.status === 'busy' && typeof shift.accepted === 'boolean')
-            );
+            isUnavailable = false;
           }
         }
-        return result;
+
+        return isUnavailable;
       },
     });
 
