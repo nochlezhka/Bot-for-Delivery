@@ -3,7 +3,7 @@ version: '3.8'
 services:
   pp-app-db:
     image: postgres
-    restart: no
+    restart: "no"
     shm_size: 128mb
     volumes:
       - pp-app-db:/var/lib/postgresql/data
@@ -16,7 +16,7 @@ services:
 
   rmq:
     image: rabbitmq:3-management
-    restart: no
+    restart: "no"
     ports:
       - "5672:5672"
       - "15672:15672"
