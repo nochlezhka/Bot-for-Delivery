@@ -26,6 +26,14 @@ services:
     networks:
       - pp-app
 
+  adminer:
+    image: adminer
+    restart: "no"
+    ports:
+      - 8081:8080
+    networks:
+      - pp-app
+
 volumes:
   pp-app-db:
     name: pp-app-db
