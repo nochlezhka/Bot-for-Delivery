@@ -9,7 +9,6 @@
         "dependsOn": ["build"],
         "executor": "@nx-tools/nx-container:build",
         "options": {
-          "load": true,
           "push": true,
           "metadata": {
             "images": [
@@ -18,7 +17,8 @@
             "tags": [
               "type=ref,event=branch"
             ]
-          }
+          },
+          "platforms": ["linux/amd64", "linux/arm64"]
         }
       }
     }
