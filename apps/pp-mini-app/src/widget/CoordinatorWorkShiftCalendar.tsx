@@ -4,13 +4,13 @@ import { Dialog, Portal } from '@ark-ui/react';
 import { useRef, useState } from 'react';
 
 import { VolunteerShift } from '@/entity/shift/types';
-import { VolunteerShiftForm } from '@/features/VolunteerShiftForm';
+import { CoordinatorShiftForm } from '@/features/CoordinatorShiftForm';
 import {
   VolunteerCalendar,
   VolunteerCalendarRef,
 } from '@/features/VoulonteerCalendar';
 
-export function VolunteerWorkShiftCalendar() {
+export function CoordinatorWorkShiftCalendar() {
   const calendarRef = useRef<VolunteerCalendarRef>(null);
   const [selectedShift, setSelectedShift] = useState<VolunteerShift | null>(
     null
@@ -39,7 +39,7 @@ export function VolunteerWorkShiftCalendar() {
               {selectedShift === null ? (
                 <></>
               ) : (
-                <VolunteerShiftForm
+                <CoordinatorShiftForm
                   shift={selectedShift}
                   onActionComplete={() =>
                     calendarRef.current?.resetAndRefresh()
