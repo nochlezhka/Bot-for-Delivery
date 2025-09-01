@@ -11,8 +11,8 @@
   }
 }
 
-
-body > div, body {
+body > div,
+body {
   height: 100vh;
   width: 100%;
   display: flex;
@@ -24,6 +24,6 @@ body > div {
 
 body {
   overflow: hidden;
-  background: var(--tg-theme-bg-color);
-  color: var(--tg-theme-text-color);
+  background: var(--color-base-200);
+  color: var(--color-base-content);
 }

@@ -1,6 +1,6 @@
-import { shiftsRouter } from '@/api/shift/router';
-import { eployeeRouter, userRouter } from '@/api/user/router';
 import { rpcRouter } from '@/api/rpc/router';
+import { shiftsRouter } from '@/api/shift/router';
+import { employeeRouter, userRouter } from '@/api/user/router';
 
 import { createCallerFactory, createTRPCRouter } from './trpc';
 
@@ -11,7 +11,7 @@ import { createCallerFactory, createTRPCRouter } from './trpc';
  */
 export const appRouter = createTRPCRouter({
   user: userRouter,
-  eployee: eployeeRouter,
+  eployee: employeeRouter,
   shift: shiftsRouter,
   rpc: rpcRouter,
 });

@@ -28,7 +28,7 @@ export const userTable = pgTable(
     id: uuid('id')
       .primaryKey()
       .$defaultFn(() => uuidv7.uuidv7()),
-    tgId: bigint('tg_id', { mode: 'bigint' }).notNull(),
+    tgId: bigint('tg_id', { mode: 'bigint' }),
     tgUsername: varchar('tg_username', { length: 32 }),
     name: varchar('name', { length: 64 }).notNull(),
     phone: varchar('phone', { length: 32 }).notNull(),

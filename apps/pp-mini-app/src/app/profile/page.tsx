@@ -10,7 +10,7 @@ export default function ProfilePage() {
       data
         ? data.tgUsername
           ? data.tgUsername
-          : '@id' + data.tgId.toString()
+          : '@id' + data.tgId?.toString()
         : null,
     [data]
   );

@@ -14,5 +14,8 @@ export const connectionFactory = (connectionString: string) => {
 
 export { schema };
 
+export type User = typeof schema.userTable.$inferSelect;
+export type NewUser = typeof schema.userTable.$inferInsert;
 export type UserRoles = (typeof schema.userRoleEnum.enumValues)[number];
+export type Gender = (typeof schema.userGender.enumValues)[number];
 export type ShiftStatus = (typeof schema.shiftStatusEnum.enumValues)[number];
