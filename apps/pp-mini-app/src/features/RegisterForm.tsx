@@ -2,11 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
-import { HTMLProps, Ref } from 'react';
+import { HTMLProps } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { useIMask } from 'react-imask';
 
 import { registerRequestSchema } from '@/api/user/schema';
+import { usePhoneMask } from '@/entity/user/hooks/use-phone.mask';
 import { Noop } from '@/shared/types';
 import { api } from '@/trpc/client';
 
@@ -28,9 +28,7 @@ export const RegisterForm = ({ onSuccess, className }: RegisterFormProps) => {
       console.log({ error });
     }
   });
-  const { ref } = useIMask({
-    mask: '+{7}(000)000-00-00',
-  });
+  const inputRef = usePhoneMask();
 
   return (
     <form onSubmit={submitAction} className={className}>
@@ -46,7 +44,7 @@ export const RegisterForm = ({ onSuccess, className }: RegisterFormProps) => {
                   'input input-lg',
                   fieldState.error ? 'input-error' : undefined
                 )}
-                ref={ref as Ref<HTMLInputElement>}
+                ref={inputRef}
                 placeholder="Введите номер телефона"
                 onChange={(e) => field.onChange(e.target.value)}
               />

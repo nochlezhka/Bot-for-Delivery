@@ -1,27 +1,20 @@
 'use client';
 import { Editable } from '@ark-ui/react/editable';
-import { maskitoPhoneOptionsGenerator } from '@maskito/phone';
-import { useMaskito } from '@maskito/react';
-import metadata from 'libphonenumber-js/min/metadata';
 import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
+
+import { usePhoneMask } from '@/entity/user/hooks/use-phone.mask';
 
 import type { User } from 'pickup-point-db';
 
 import { UserFormContext } from '../../Context';
-
-const options = maskitoPhoneOptionsGenerator({
-  countryIsoCode: 'RU',
-  strict: true,
-  metadata,
-});
 
 export const PhoneField = () => {
   const { control } = useFormContext<User>();
   const { field, fieldState } = useController({ name: 'phone', control });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);
-  const inputRef = useMaskito({ options });
+  const inputRef = usePhoneMask();
 
   return (
     <fieldset className="fieldset">
