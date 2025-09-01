@@ -8,7 +8,11 @@ import {
   publicProcedure,
 } from '@/server/api/trpc';
 
-import { registerRequestSchema } from './schema';
+import {
+  createRequestSchema,
+  registerRequestSchema,
+  updateRequestSchema,
+} from './schema';
 
 export const userRouter = createTRPCRouter({
   profile: publicProcedure.query(async ({ ctx }) => {
@@ -39,7 +43,7 @@ export const userRouter = createTRPCRouter({
     }),
 });
 
-export const eployeeRouter = createTRPCRouter({
+export const employeeRouter = createTRPCRouter({
   getUsers: employeeProcedure
     .input(
       z.object({
@@ -51,19 +55,19 @@ export const eployeeRouter = createTRPCRouter({
         where: ({ role }, { eq }) => eq(role, input.selected),
       })
     ),
-  changeUserRole: employeeProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        role: z.enum(schema.userRoleEnum.enumValues),
-      })
-    )
+  updateUser: employeeProcedure
+    .input(updateRequestSchema)
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
-        .update(schema.userTable)
-        .set({
-          role: input.role,
-        })
-        .where(eq(schema.userTable.id, input.id));
+      if (Object.keys(input).length !== 0) {
+        await ctx.db
+          .update(schema.userTable)
+          .set(input)
+          .where(eq(schema.userTable.id, input.id));
+      }
+    }),
+  createUser: employeeProcedure
+    .input(createRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.insert(schema.userTable).values(input);
     }),
 });
