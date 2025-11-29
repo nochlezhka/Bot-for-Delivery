@@ -1,5 +1,6 @@
 'use client';
 
+import { ScrollArea } from '@ark-ui/react';
 import { clsx } from 'clsx';
 import { atom } from 'jotai';
 import { useAtomValue } from 'jotai/react';
@@ -57,23 +58,39 @@ export const AuthenticatedView = ({ children }: PropsWithChildren) => {
   const tabList = useAtomValue(tabListAtom);
 
   return (
-    <div className="!grid grid-rows-[50px_1fr] w-full gap-2">
-      <div role="tablist" className="tabs tabs-box tabs-sm rounded-none">
-        {tabList.map(({ link, title, Icon }) => (
-          <NextLink
-            key={link}
-            href={link}
-            role="tab"
-            className={clsx(
-              pathname === link ? 'tab-active' : null,
-              'tab flex justify-center items-center [&>span]:flex flex-grow self-center'
-            )}
+    <div className="!grid grid-rows-[50px_1fr] w-screen gap-2 overflow-hidden h-dvh">
+      <ScrollArea.Root className="w-full overflow-hidden sticky! top-0">
+        <ScrollArea.Viewport>
+          <ScrollArea.Content
+            role="tablist"
+            className="tabs tabs-box tabs-sm rounded-none grid grid-flow-col auto-cols-[calc(100vw/3)]"
           >
-            <Icon className="size-4" />
-            <span className="hidden sm:flex font-light ml-2">{title}</span>
-          </NextLink>
-        ))}
-      </div>
+            {tabList.map(({ link, title, Icon }) => (
+              <NextLink
+                key={link}
+                href={link}
+                role="tab"
+                className={clsx(
+                  pathname === link ? 'tab-active' : null,
+                  'tab flex justify-center items-center [&>span]:flex flex-grow self-center flex-nowrap'
+                )}
+              >
+                <Icon className="size-4 shrink-0" />
+                <span className="hidden! min-[400px]:flex! font-light ml-2">
+                  {title}
+                </span>
+              </NextLink>
+            ))}
+          </ScrollArea.Content>
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar
+          orientation="horizontal"
+          className="data-[hover]:flex data-[dragging]:flex data-[scrolling]:flex hidden bg-transparent"
+        >
+          <ScrollArea.Thumb className="w-2 h-1 rounded-xl bg-secondary" />
+        </ScrollArea.Scrollbar>
+      </ScrollArea.Root>
+
       {children}
     </div>
   );

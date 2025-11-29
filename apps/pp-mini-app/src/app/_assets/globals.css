@@ -27,3 +27,10 @@ body {
   background: var(--color-base-200);
   color: var(--color-base-content);
 }
+
+[data-scope='scroll-area'][data-part='viewport'] {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
