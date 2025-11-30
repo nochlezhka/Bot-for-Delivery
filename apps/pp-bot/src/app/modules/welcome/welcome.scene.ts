@@ -6,6 +6,7 @@ import { CallbackQuery, Message } from 'typegram';
 import {
   REQUEST_CONTACT_KEYBOARD,
   REQUEST_GENDER_KEYBOARD,
+  REMOVE_KEYBOARD,
   WELCOME_SCENE_ID,
 } from './constant';
 import { ExpectedState, ResultState } from './type';
@@ -40,7 +41,7 @@ export class WelcomeScene {
         tgId: BigInt(user_id),
       });
     }
-    return 'Вы зарегистрированы! Пожалуйста, ожидайте подтверждения статуса волонтера.';
+    await ctx.reply('Вы зарегистрированы! Пожалуйста, ожидайте подтверждения статуса волонтера.');
   }
 
   @On('contact')
@@ -49,6 +50,7 @@ export class WelcomeScene {
       ...(ctx.scene.session.state ?? {}),
       contact: (ctx.message as Message.ContactMessage).contact,
     };
+    await ctx.reply('Спасибо! Контакт получен.', REMOVE_KEYBOARD);
     await ctx.reply('Теперь необходимо указать пол', REQUEST_GENDER_KEYBOARD);
   }
 
