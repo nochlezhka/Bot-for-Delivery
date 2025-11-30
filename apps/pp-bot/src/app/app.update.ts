@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
-import { schema } from 'pickup-point-db';
+import { COMMANDS } from './bot-commands';
 
 import { Logger } from '@nestjs/common';
 import { WELCOME_SCENE_ID } from './modules/welcome';
@@ -33,7 +33,13 @@ export class AppUpdate {
 
   @Help()
   async help(@Ctx() ctx: TelegrafContext) {
-    await this.baseHandler(ctx);
+    const role = ctx.user?.role ?? 'guest';
+
+    const commandList = COMMANDS[role]
+      .map(c => `/${c.command} — ${c.description}`)
+      .join('\n');
+
+    await ctx.reply(`Доступные команды:\n\n${commandList}`);
   }
 
   @On('text')

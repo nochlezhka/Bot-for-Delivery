@@ -12,6 +12,7 @@ import { ShiftConfirmModule } from './modules/shift-confirm';
 import { WelcomeModule } from './modules/welcome';
 import { RpcModule } from './modules/rpc';
 import {UserMiddlewareModule} from './modules/user-middleware';
+import {BotStartupService} from './bot-startup.service'
 
 @Module({
   imports: [
@@ -26,6 +27,11 @@ import {UserMiddlewareModule} from './modules/user-middleware';
     RpcModule,
     UserMiddlewareModule,
   ],
-  providers: [AppUpdate, SendConfirmCommandHandler, Logger],
+  providers: [
+    AppUpdate,
+    SendConfirmCommandHandler,
+    Logger,
+    BotStartupService,
+  ]
 })
 export class AppModule {}
