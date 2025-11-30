@@ -16,12 +16,12 @@ export class AppUpdate {
     }
     if (ctx.user.role !== 'unregistered') {
       if (ctx.user.role === 'guest') {
-          await ctx.reply('Пожалуйста, ожидайте зачисления в волонтеры.');
+        await ctx.reply('Пожалуйста, ожидайте зачисления в волонтеры.');
       } else if (ctx.user.role === 'volunteer') {
-          await ctx.reply('Вы можете выбрать смены в приложении.');
-        }
-      } else {
-        await ctx.scene.enter(WELCOME_SCENE_ID);
+        await ctx.reply('Вы можете выбрать смены в приложении.');
+      }
+    } else {
+      await ctx.scene.enter(WELCOME_SCENE_ID);
     }
   }
 
