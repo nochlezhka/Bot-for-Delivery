@@ -11,6 +11,7 @@ import { DrizzleModule } from './drizzle';
 import { ShiftConfirmModule } from './modules/shift-confirm';
 import { WelcomeModule } from './modules/welcome';
 import { RpcModule } from './modules/rpc';
+import {UserMiddlewareModule} from './modules/user-middleware';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { RpcModule } from './modules/rpc';
     WelcomeModule,
     ShiftConfirmModule,
     RpcModule,
+    UserMiddlewareModule,
   ],
   providers: [AppUpdate, SendConfirmCommandHandler, Logger],
 })

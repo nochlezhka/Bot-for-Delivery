@@ -1,36 +1,33 @@
 import { Inject } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
 import { Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
 import { schema } from 'pickup-point-db';
 
-import { Drizzle } from './drizzle';
+import { Logger } from '@nestjs/common';
 import { WELCOME_SCENE_ID } from './modules/welcome';
 import { type TelegrafContext } from './type';
 
 @Update()
 export class AppUpdate {
-  @Inject() private readonly drizzle!: Drizzle;
+  @Inject() private readonly logger!: Logger;
 
   async baseHandler(ctx: TelegrafContext) {
-    const fromId = ctx.from?.id;
-    if (fromId) {
-      const existsUser = await this.drizzle.db.query.userTable.findFirst({
-        where: eq(schema.userTable.tgId, BigInt(fromId)),
-      });
-      if (existsUser) {
-        if (existsUser.role === 'guest') {
+    if (!ctx.user) {
+      return;
+    }
+    if (ctx.user.role !== 'unregistered') {
+      if (ctx.user.role === 'guest') {
           await ctx.reply('Пожалуйста, ожидайте зачисления в волонтеры.');
-        } else if (existsUser.role === 'volunteer') {
+      } else if (ctx.user.role === 'volunteer') {
           await ctx.reply('Вы можете выбрать смены в приложении.');
         }
       } else {
         await ctx.scene.enter(WELCOME_SCENE_ID);
-      }
     }
   }
 
   @Start()
   async start(@Ctx() ctx: TelegrafContext) {
+    this.logger.log("Start pressed");
     await this.baseHandler(ctx);
   }
 
@@ -41,6 +38,7 @@ export class AppUpdate {
 
   @On('text')
   async onText(@Ctx() ctx: TelegrafContext) {
+    this.logger.log("Text received");
     await this.baseHandler(ctx);
   }
 }
