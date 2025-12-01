@@ -1,37 +1,49 @@
-import { Logger, Module } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TelegrafModule } from 'nestjs-telegraf';
+import { ClsModule } from 'nestjs-cls';
+import { InjectBot, TelegrafModule } from 'nestjs-telegraf';
+import { Telegraf } from 'telegraf';
 
+import { AppClsModule } from './app.cls';
 import { AppUpdate } from './app.update';
 import { SendConfirmCommandHandler } from './commands';
-import { TelegrafConfig } from './config';
+import { DEFAULT_COMMANDS, TelegrafConfig } from './config';
 import { DrizzleModule } from './drizzle';
+import { RpcModule } from './modules/rpc';
 import { ShiftConfirmModule } from './modules/shift-confirm';
 import { WelcomeModule } from './modules/welcome';
-import { RpcModule } from './modules/rpc';
-import {UserMiddlewareModule} from './modules/user-middleware';
-import {BotStartupService} from './bot-startup.service'
+import { TelegrafContext } from './type';
 
 @Module({
   imports: [
+    ClsModule.forRoot({
+      global: true,
+    }),
+    AppClsModule,
     CqrsModule.forRoot(),
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
-    TelegrafModule.forRootAsync(TelegrafConfig),
     DrizzleModule,
+
+    TelegrafModule.forRootAsync(TelegrafConfig),
 
     WelcomeModule,
     ShiftConfirmModule,
     RpcModule,
-    UserMiddlewareModule,
   ],
-  providers: [
-    AppUpdate,
-    SendConfirmCommandHandler,
-    Logger,
-    BotStartupService,
-  ]
+  providers: [AppUpdate, SendConfirmCommandHandler, Logger],
 })
-export class AppModule {}
+export class AppModule implements OnModuleInit {
+  constructor(
+    private readonly logger: Logger,
+    @InjectBot()
+    private readonly bot: Telegraf<TelegrafContext>
+  ) {}
+
+  async onModuleInit() {
+    await this.bot.telegram.setMyCommands(DEFAULT_COMMANDS);
+    this.logger.log('Telegram commands set.');
+  }
+}

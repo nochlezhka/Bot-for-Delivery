@@ -20,7 +20,6 @@ export const userRoleEnum = pgEnum('user_role', [
   'volunteer',
   'coordinator',
   'guest',
-  'unregistered',
 ]);
 export const userGender = pgEnum('user_gender', ['male', 'female']);
 export const userTable = pgTable(
@@ -85,7 +84,6 @@ export const userShiftsTable = pgTable(
 export const shiftRelations = relations(shiftTable, ({ many }) => ({
   userShifts: many(userShiftsTable),
 }));
-
 
 export const userShiftsRelations = relations(userShiftsTable, ({ one }) => ({
   shift: one(shiftTable, {

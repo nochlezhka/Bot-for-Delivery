@@ -2,14 +2,17 @@ import { Scenes } from 'telegraf';
 
 import type { UserRoles } from 'pickup-point-db';
 
-export type BaseContext = Scenes.SceneContext;
-export type User = {
-    id: number;
-    role: UserRoles;
-    tgId: number;
-  };
+export type RegisteredUser = {
+  id: number;
+  role: UserRoles;
+  tgId: number;
+};
 
+export type UnregisteredUser = {
+  id: null;
+  role: null;
+  tgId: number;
+};
+export type User = RegisteredUser | UnregisteredUser;
 
-export interface TelegrafContext extends BaseContext {
-  user?: User | null;
-}
+export type TelegrafContext = Scenes.SceneContext;
