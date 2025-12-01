@@ -39,6 +39,7 @@
     "libphonenumber-js": "^1.12.6",
     "lucide-react": "^0.487.0",
     "nest-commander": "^3.17.0",
+    "nestjs-cls": "^6.1.0",
     "nestjs-telegraf": "^2.8.1",
     "next": "^14.2.26",
     "pg": "^8.14.1",

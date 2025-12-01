@@ -85,7 +85,6 @@ export const shiftRelations = relations(shiftTable, ({ many }) => ({
   userShifts: many(userShiftsTable),
 }));
 
-
 export const userShiftsRelations = relations(userShiftsTable, ({ one }) => ({
   shift: one(shiftTable, {
     fields: [userShiftsTable.shiftId],
