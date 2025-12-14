@@ -64,6 +64,13 @@
       "when": 1753568365777,
       "tag": "0008_fluffy_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1765712039060,
+      "tag": "0009_nappy_catseye",
+      "breakpoints": true
     }
   ]
 }

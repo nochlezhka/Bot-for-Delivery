@@ -5,6 +5,7 @@ import {
   pgEnum,
   pgTable,
   primaryKey,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -14,6 +15,16 @@ import {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const uuidv7 = require('@kripod/uuidv7');
+
+export const pickupPointTable = pgTable('pickup_point', {
+  id: uuid('id')
+    .primaryKey()
+    .$defaultFn(() => uuidv7.uuidv7()),
+  schedule: text('schedule'),
+  name: varchar('name', { length: 64 }).notNull(),
+  address: text('address'),
+  description: text('description'),
+});
 
 export const userRoleEnum = pgEnum('user_role', [
   'employee',
@@ -34,6 +45,7 @@ export const userTable = pgTable(
     phone: varchar('phone', { length: 32 }).notNull(),
     gender: userGender('gender').notNull(),
     role: userRoleEnum('role').default('guest').notNull(),
+    pickupId: uuid('pickup_id').references(() => pickupPointTable.id),
   },
   (table) => [uniqueIndex('uniqueTgId').on(table.tgId)]
 );
