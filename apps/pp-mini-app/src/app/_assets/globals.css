@@ -5,7 +5,7 @@
   name: "homeless-light";
 
   default: true; /* set as default */
-  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  prefers-dark: false; /* set as default dark mode (prefers-color-scheme:dark) */
   color-scheme: light; /* color of browser-provided UI */
 
   --color-base-100: #FFFFFF;
@@ -89,7 +89,7 @@ body {
 
 
 @plugin "daisyui" {
-  themes: homeless-light --default, homeless-light --prefersdark;
+  themes: homeless-light --default, homeless-light --prefers-dark;
 }
 
 .rainbow-outline {

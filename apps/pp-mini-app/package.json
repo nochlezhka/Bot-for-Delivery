@@ -6,7 +6,9 @@
     "name": "pp-mini-app",
     "targets": {
       "ci": {
-        "dependsOn": ["build"],
+        "dependsOn": [
+          "build"
+        ],
         "executor": "@nx-tools/nx-container:build",
         "options": {
           "push": true,
@@ -18,15 +20,18 @@
               "type=ref,event=branch"
             ]
           },
-          "platforms": ["linux/amd64", "linux/arm64"]
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ]
         }
       }
     }
   },
   "dependencies": {
-    "next": "^14.2.26",
+    "next": "^16.0.10",
     "pickup-point-db": "^0.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   }
 }

@@ -1,5 +1,3 @@
-const { composePlugins, withNx } = require('@nx/next');
-
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
  **/
@@ -9,17 +7,11 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false,
   },
-  experimental: {
-    instrumentationHook: true,
-    serverComponentsExternalPackages: [
-      '@nestjs/microservices',
-      '@nestjs/core',
-      'amqplib',
-      'amqp-connection-manager',
-    ],
-  },
+
   output: 'standalone',
 };
+
+const { composePlugins, withNx } = require('@nx/next');
 
 const plugins = [
   // Add more Next.js plugins to this list if needed.
