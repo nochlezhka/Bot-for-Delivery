@@ -35,7 +35,7 @@ export function VolunteerWorkShiftCalendar() {
       >
         <Portal>
           <Dialog.Positioner className="absolute z-10 flex justify-center items-center">
-            <Dialog.Content className="flex bg-[var(--tg-theme-bg-color)] p-5 rounded-lg">
+            <Dialog.Content className="flex bg-base-100 text-primary-content p-5 rounded-lg">
               {selectedShift === null ? (
                 <></>
               ) : (

@@ -1,13 +1,18 @@
 'use client';
 
-import { ScrollArea } from '@ark-ui/react';
-import { clsx } from 'clsx';
 import { atom } from 'jotai';
 import { useAtomValue } from 'jotai/react';
-import { BriefcaseBusiness, CalendarSearch, User, Users } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  CalendarSearch,
+  TableOfContents,
+  User,
+  Users,
+  X,
+} from 'lucide-react';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HTMLProps, PropsWithChildren } from 'react';
+import { HTMLProps, PropsWithChildren, useMemo } from 'react';
 
 import { isEmployeeAtom } from '@/entity/employee/state';
 import { roleAtom } from '@/entity/user/state';
@@ -19,11 +24,11 @@ const tabListAtom = atom((get) => {
   if (role) {
     result.push(
       {
-        link: '/',
+        link: '/profile',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
-          <CalendarSearch className={className} />
+          <User className={className} />
         ),
-        title: 'Календарь',
+        title: 'Профиль',
       },
       {
         link: '/planned',
@@ -33,11 +38,11 @@ const tabListAtom = atom((get) => {
         title: 'Дежурства',
       },
       {
-        link: '/profile',
+        link: '/',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
-          <User className={className} />
+          <CalendarSearch className={className} />
         ),
-        title: 'Профиль',
+        title: 'Календарь',
       }
     );
   }
@@ -53,45 +58,47 @@ const tabListAtom = atom((get) => {
   return result;
 });
 
-export const AuthenticatedView = ({ children }: PropsWithChildren) => {
+const FabMenu = () => {
   const pathname = usePathname();
   const tabList = useAtomValue(tabListAtom);
-
+  const currentTab = useMemo(
+    () => tabList.find((s) => s.link === pathname),
+    [tabList, pathname]
+  );
   return (
-    <div className="!grid grid-rows-[50px_1fr] w-screen gap-2 overflow-hidden h-dvh">
-      <ScrollArea.Root className="w-full overflow-hidden sticky! top-0">
-        <ScrollArea.Viewport>
-          <ScrollArea.Content
-            role="tablist"
-            className="tabs tabs-box tabs-sm rounded-none grid grid-flow-col auto-cols-[calc(100vw/3)]"
-          >
-            {tabList.map(({ link, title, Icon }) => (
-              <NextLink
-                key={link}
-                href={link}
-                role="tab"
-                className={clsx(
-                  pathname === link ? 'tab-active' : null,
-                  'tab flex justify-center items-center [&>span]:flex flex-grow self-center flex-nowrap'
-                )}
-              >
-                <Icon className="size-4 shrink-0" />
-                <span className="hidden! min-[400px]:flex! font-light ml-2">
-                  {title}
-                </span>
-              </NextLink>
-            ))}
-          </ScrollArea.Content>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar
-          orientation="horizontal"
-          className="data-[hover]:flex data-[dragging]:flex data-[scrolling]:flex hidden bg-transparent"
+    <div className="fab fab-flower">
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-lg btn-circle btn-success"
+      >
+        {currentTab ? (
+          <currentTab.Icon className="size-4 shrink-0" />
+        ) : (
+          <TableOfContents className="size-4 shrink-0" />
+        )}
+      </div>
+      <div role="button" className="fab-main-action btn btn-circle btn-lg">
+        <X className="size-4 shrink-0" />
+      </div>
+      {tabList.map((tab, i) => (
+        <NextLink
+          href={tab.link}
+          className="btn btn-lg btn-circle"
+          key={`${tab.link}-${i}`}
         >
-          <ScrollArea.Thumb className="w-2 h-1 rounded-xl bg-secondary" />
-        </ScrollArea.Scrollbar>
-      </ScrollArea.Root>
+          <tab.Icon className="size-4 shrink-0" />
+        </NextLink>
+      ))}
+    </div>
+  );
+};
 
+export const AuthenticatedView = ({ children }: PropsWithChildren) => {
+  return (
+    <div className="!grid grid-rows-1fr w-screen gap-2 overflow-hidden h-dvh">
       {children}
+      <FabMenu />
     </div>
   );
 };

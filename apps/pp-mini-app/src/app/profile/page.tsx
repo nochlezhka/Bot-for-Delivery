@@ -25,8 +25,29 @@ export default function ProfilePage() {
           </div>
           <div className="ml-2 flex flex-col space-y-2">
             <p className="text-xl font-bold">{data.name}</p>
-            <p className="text-[var(--tg-theme-subtitle-text-color)]">
-              {data.gender === 'male' ? 'Мужчина' : 'Женщина'}
+            <p className="text-secondary-content lowercase flex flex-wrap gap-2">
+              <span>
+                {(() => {
+                  let result = 'Неизвестная роль';
+                  switch (data.role) {
+                    case 'guest':
+                      result = 'Гость';
+                      break;
+                    case 'volunteer':
+                      result = 'Волонтер';
+                      break;
+                    case 'coordinator':
+                      result = 'Координатор';
+                      break;
+                    case 'employee':
+                      result = 'Сотрудник';
+                      break;
+                  }
+
+                  return result;
+                })()}
+              </span>
+              <span>{data.gender === 'male' ? 'Мужчина' : 'Женщина'}</span>
             </p>
             <p className="">{data.phone}</p>
             <a

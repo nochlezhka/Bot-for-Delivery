@@ -4,7 +4,7 @@ import { Dialog, Portal } from '@ark-ui/react';
 import { useRef, useState } from 'react';
 
 import { VolunteerShift } from '@/entity/shift/types';
-import { CoordinatorShiftForm } from '@/features/CoordinatorShiftForm';
+import { VolunteerShiftForm } from '@/features/VolunteerShiftForm';
 import {
   VolunteerCalendar,
   VolunteerCalendarRef,
@@ -35,11 +35,11 @@ export function CoordinatorWorkShiftCalendar() {
       >
         <Portal>
           <Dialog.Positioner className="absolute z-10 flex justify-center items-center">
-            <Dialog.Content className="flex bg-[var(--tg-theme-bg-color)] p-5 rounded-lg">
+            <Dialog.Content className="flex bg-base-100 p-5 rounded-lg">
               {selectedShift === null ? (
                 <></>
               ) : (
-                <CoordinatorShiftForm
+                <VolunteerShiftForm
                   shift={selectedShift}
                   onActionComplete={() =>
                     calendarRef.current?.resetAndRefresh()
