@@ -13,6 +13,7 @@ import { DEFAULT_COMMANDS, TelegrafConfig } from './config';
 import { DrizzleModule } from './drizzle';
 import { RpcModule } from './modules/rpc';
 import { ShiftConfirmModule } from './modules/shift-confirm';
+import { ShiftsModule } from './modules/shifts';
 import { WelcomeModule } from './modules/welcome';
 import { TelegrafContext } from './type';
 
@@ -32,6 +33,7 @@ import { TelegrafContext } from './type';
     WelcomeModule,
     ShiftConfirmModule,
     RpcModule,
+    ShiftsModule,
   ],
   providers: [AppUpdate, SendConfirmCommandHandler, Logger],
 })
