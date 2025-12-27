@@ -1,1 +1,0 @@
-ALTER TABLE "shift" DROP COLUMN "duration";

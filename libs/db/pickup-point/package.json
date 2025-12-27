@@ -30,6 +30,20 @@
           "stripLeadingPaths": true
         }
       },
+      "prisma:pull": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma db pull --schema=./prisma/schema.prisma",
+          "cwd": "libs/db/pickup-point"
+        }
+      },
+      "prisma:generate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "prisma generate --schema=./prisma/schema.prisma",
+          "cwd": "libs/db/pickup-point"
+        }
+      },
       "push": {
         "executor": "nx:run-commands",
         "options": {
@@ -66,7 +80,10 @@
               "type=ref,event=branch"
             ]
           },
-          "platforms": ["linux/amd64", "linux/arm64"]
+          "platforms": [
+            "linux/amd64",
+            "linux/arm64"
+          ]
         }
       }
     }

@@ -1,0 +1,72 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model pickup_point {
+  id          String  @id @db.Uuid
+  schedule    String?
+  name        String  @db.VarChar(64)
+  address     String?
+  description String?
+  users       users[]
+}
+
+model shift {
+  id                String              @id @db.Uuid
+  date_start        DateTime            @db.Timestamp(6)
+  date_end          DateTime            @db.Timestamp(6)
+  title             String              @db.VarChar(64)
+  status            shift_status        @default(free)
+  user_shifts_table user_shifts_table[]
+
+  @@unique([date_start, date_end], map: "uniqueDate")
+}
+
+model user_shifts_table {
+  user_id                   String   @db.Uuid
+  shift_id                  String   @db.Uuid
+  status                    Boolean?
+  confirmation_request_sent Boolean  @default(false)
+  shift                     shift    @relation(fields: [shift_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_shifts_table_shift_id_shift_id_fk")
+  users                     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_shifts_table_user_id_users_id_fk")
+
+  @@id([user_id, shift_id], map: "user_shifts_pkey")
+}
+
+model users {
+  id                String              @id @db.Uuid
+  tg_id             BigInt?             @unique(map: "uniqueTgId")
+  tg_username       String?             @db.VarChar(32)
+  name              String              @db.VarChar(64)
+  phone             String              @db.VarChar(32)
+  gender            user_gender
+  role              user_role           @default(guest)
+  pickup_id         String?             @db.Uuid
+  user_shifts_table user_shifts_table[]
+  pickup_point      pickup_point?       @relation(fields: [pickup_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_pickup_id_pickup_point_id_fk")
+}
+
+enum shift_status {
+  busy
+  halfBusy
+  free
+  weekend
+}
+
+enum user_gender {
+  male
+  female
+}
+
+enum user_role {
+  employee
+  volunteer
+  coordinator
+  guest
+}
