@@ -9,7 +9,7 @@ datasource db {
 }
 
 model pickup_point {
-  id          String  @id @db.Uuid
+  id          String  @id @default(uuid(7)) @db.Uuid
   schedule    String?
   name        String  @db.VarChar(64)
   address     String?
@@ -18,7 +18,7 @@ model pickup_point {
 }
 
 model shift {
-  id                String              @id @db.Uuid
+  id                String              @id @default(uuid(7)) @db.Uuid
   date_start        DateTime            @db.Timestamp(6)
   date_end          DateTime            @db.Timestamp(6)
   title             String              @db.VarChar(64)
@@ -40,7 +40,7 @@ model user_shifts_table {
 }
 
 model users {
-  id                String              @id @db.Uuid
+  id                String              @id @default(uuid(7)) @db.Uuid
   tg_id             BigInt?             @unique(map: "uniqueTgId")
   tg_username       String?             @db.VarChar(32)
   name              String              @db.VarChar(64)
