@@ -1,15 +1,14 @@
 import { Inject, Logger, UseGuards } from '@nestjs/common';
-import { Ctx, Help, On, Start, Update, Command, Action } from 'nestjs-telegraf';
-
-import {Markup} from 'telegraf';
+import { Action, Command, Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
+import { Markup } from 'telegraf';
 
 import { AppCls } from './app.cls';
 import { DEFAULT_COMMANDS, USER_COMMANDS } from './config';
 import { WELCOME_SCENE_ID } from './modules/welcome';
-import { type TelegrafContext } from './type';
+import { PrismaDb } from './prisma';
 import { Role } from './role.decorator';
-import {RoleGuard} from './role.guard';
-import { ShiftsService } from './modules/shifts/shifts.service';
+import { RoleGuard } from './role.guard';
+import { type TelegrafContext } from './type';
 
 export const SHIFT_PATTERN = new RegExp(`^shift:([\w\d\-]+):(.*)$`);
 
@@ -17,7 +16,7 @@ export const SHIFT_PATTERN = new RegExp(`^shift:([\w\d\-]+):(.*)$`);
 export class AppUpdate {
   @Inject() private readonly logger!: Logger;
   @Inject() private readonly appCls!: AppCls;
-  @Inject() private readonly shiftService!: ShiftsService;
+  @Inject() private readonly db!: PrismaDb;
 
   async baseHandler(ctx: TelegrafContext) {
     const userRole = this.appCls.get('user.role');
@@ -53,7 +52,6 @@ export class AppUpdate {
     await ctx.reply(`Доступные команды:\n\n${commandList}`);
   }
 
-
   @Role(['volunteer'])
   @UseGuards(RoleGuard)
   @Command('shifts')
@@ -67,10 +65,11 @@ export class AppUpdate {
       return;
     }
 
-    const keyboard = Markup.inlineKeyboard(shifts.map(s => [
-        Markup.button.callback(`${s.title} ⬇️`, `shift:${s.id}:expand`)
-    ]
-    ));
+    const keyboard = Markup.inlineKeyboard(
+      shifts.map((s) => [
+        Markup.button.callback(`${s.title} ⬇️`, `shift:${s.id}:expand`),
+      ])
+    );
 
     this.logger.log('action: ', `shift:${shifts[0].id}:expand`);
 
@@ -84,43 +83,39 @@ export class AppUpdate {
   async expandShift(@Ctx() ctx: TelegrafContext) {
     const shiftId = ctx.match![0];
     const action = ctx.match![1];
-    const shift = await this.shiftService.getShiftById(shiftId);
+    const shift = await this.db.shift.findUnique({ where: { id: shiftId } });
 
-    const shifts = await this.shiftService.getShifts();
+    if (shift) {
+      const text =
+        `*${shift.title}* (${shift.date_start}–${shift.date_end})\n` +
+        `📍 *Status:* ${shift.status}\n`;
 
-    if (!shift) {
+      await ctx.editMessageText(text, {
+        parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [
+              {
+                text: 'Collapse ⬆️',
+                callback_data: `shift:${shiftId}:collapse`,
+              },
+            ],
+            [
+              {
+                text: 'Register',
+                callback_data: `shift:${shiftId}:register`,
+              },
+            ],
+          ],
+        },
+      });
+
+      await ctx.answerCbQuery();
+    } else {
       this.logger.error(`Shift with ID ${shiftId} not found`);
       await ctx.answerCbQuery('❌ Shift not found');
-      return;
     }
-
-    const text =
-      `*${shift.title}* (${shift.dateStart}–${shift.dateEnd})\n` +
-      `📍 *Status:* ${shift.status}\n`;
-
-    await ctx.editMessageText(text, {
-      parse_mode: 'Markdown',
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: 'Collapse ⬆️',
-              callback_data: `shift:${shiftId}:collapse`,
-            },
-          ],
-          [
-            {
-              text: 'Register',
-              callback_data: `shift:${shiftId}:register`,
-            },
-          ],
-        ],
-      },
-    });
-
-    await ctx.answerCbQuery();
   }
-
 
   // Generic text handler should be last!
   @On('text')
