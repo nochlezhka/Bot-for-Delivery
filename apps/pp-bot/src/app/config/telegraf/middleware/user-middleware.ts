@@ -1,19 +1,17 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { schema } from 'pickup-point-db';
 import { noop } from 'rxjs';
 import { MiddlewareFn, MiddlewareObj } from 'telegraf';
 import { BotCommandScopeChat } from 'telegraf/types';
 
 import { AppCls } from '../../../app.cls';
-import { Drizzle } from '../../../drizzle';
+import { PrismaDb } from '../../../prisma';
 import { type TelegrafContext } from '../../../type';
 import { DEFAULT_COMMANDS, USER_COMMANDS } from '../bot-commands';
 
 @Injectable()
 export class UserMiddleware implements MiddlewareObj<TelegrafContext> {
   @Inject() private readonly logger!: Logger;
-  @Inject() private readonly drizzle!: Drizzle;
+  @Inject() private readonly prisma!: PrismaDb;
   @Inject() private readonly appCls!: AppCls;
 
   middleware(): MiddlewareFn<TelegrafContext> {
@@ -24,15 +22,15 @@ export class UserMiddleware implements MiddlewareObj<TelegrafContext> {
       let result = noop;
 
       if (fromId) {
-        const user = await this.drizzle.db.query.userTable.findFirst({
-          where: eq(schema.userTable.tgId, BigInt(fromId)),
+        const user = await this.prisma.users.findUnique({
+          where: { tg_id: fromId },
         });
 
-        if (user) {
+        if (user && user.tg_id) {
           this.appCls.set('user', {
             id: Number(user.id),
             role: user.role,
-            tgId: Number(user.tgId),
+            tgId: Number(user.tg_id),
           });
         } else {
           this.appCls.set('user', {

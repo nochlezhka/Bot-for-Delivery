@@ -10,10 +10,10 @@ import { AppClsModule } from './app.cls';
 import { AppUpdate } from './app.update';
 import { SendConfirmCommandHandler } from './commands';
 import { DEFAULT_COMMANDS, TelegrafConfig } from './config';
-import { DrizzleModule } from './drizzle';
 import { RpcModule } from './modules/rpc';
 import { ShiftConfirmModule } from './modules/shift-confirm';
 import { WelcomeModule } from './modules/welcome';
+import { PrismaModule } from './prisma';
 import { TelegrafContext } from './type';
 
 @Module({
@@ -25,7 +25,7 @@ import { TelegrafContext } from './type';
     CqrsModule.forRoot(),
     ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
-    DrizzleModule,
+    PrismaModule,
 
     TelegrafModule.forRootAsync(TelegrafConfig),
 
