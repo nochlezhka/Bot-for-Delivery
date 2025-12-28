@@ -1,6 +1,13 @@
-generator client {
+generator cjs {
+  provider     = "prisma-client"
+  output       = "../cjs"
+  engineType   = "client"
+  moduleFormat = "cjs"
+}
+
+generator esm {
   provider   = "prisma-client"
-  output     = "../src"
+  output     = "../esm"
   engineType = "client"
 }
 

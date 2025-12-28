@@ -1,0 +1,15 @@
+{
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true,
+      "dynamicImport": true
+    },
+    "transform": {},
+    "target": "es2020"
+  },
+  "module": {
+    "type": "es6"
+  },
+  "minify": false
+}

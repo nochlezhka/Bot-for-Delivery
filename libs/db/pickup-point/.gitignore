@@ -1,2 +1,5 @@
-src/*
-!src/.gitkeep
+esm/*
+!esm/index.ts
+cjs/*
+!cjs/index.ts
+dist*
