@@ -1,11 +1,12 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { SetupHolidaysCliCommand } from './commands/setup-holidays.cli-command';
+import { PrismaModule } from '../app/prisma';
 
 @Module({
   imports: [ConfigModule.forRoot(), HttpModule, PrismaModule],
-  providers: [SetupHolidaysCliCommand],
+  providers: [SetupHolidaysCliCommand, Logger],
 })
 export class AppModule {}

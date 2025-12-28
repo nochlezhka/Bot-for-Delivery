@@ -1,9 +1,11 @@
 import { HttpService } from '@nestjs/axios';
 import { Inject } from '@nestjs/common';
-import { differenceInSeconds } from 'date-fns/differenceInSeconds';
 import { endOfDay } from 'date-fns/endOfDay';
 import { startOfDay } from 'date-fns/startOfDay';
 import { Command, CommandRunner } from 'nest-commander';
+import { firstValueFrom } from 'rxjs';
+
+import type { shiftCreateManyInput } from 'pickup-point-db/models';
 
 import { PrismaDb } from '../../app/prisma';
 
@@ -24,24 +26,26 @@ export class SetupHolidaysCliCommand extends CommandRunner {
   @Inject() private readonly db!: PrismaDb;
 
   async run() {
-    this.http
-      .get<ExpectedResponse>(HOLIDAY_CALENADAR_URL)
-      .subscribe((response) =>
-        this.db.shift.createMany({
-          data: Array.from(Object.values(response.data))
-            .filter(({ work }) => work === '0')
-            .map(({ day, zag }) => {
-              const date_start = startOfDay(day);
-              const date_end = endOfDay(day);
-              return {
-                status: 'weekend',
-                date_end,
-                date_start,
-                duration: differenceInSeconds(date_end, date_start),
-                title: zag ?? '',
-              };
-            }),
-        })
-      );
+    const response = await firstValueFrom(
+      this.http.get<ExpectedResponse>(HOLIDAY_CALENADAR_URL)
+    );
+    const holidaysInfo = Array.from(Object.values(response.data));
+
+    const data = new Array<shiftCreateManyInput>();
+    for (const dayInfo of holidaysInfo) {
+      if (dayInfo.work === '0') {
+        const date_start = startOfDay(dayInfo.day);
+        const date_end = endOfDay(dayInfo.day);
+        data.push({
+          status: 'weekend',
+          date_end,
+          date_start,
+          title: dayInfo.zag ?? '',
+        });
+      }
+    }
+    await this.db.shift.createMany({
+      data,
+    });
   }
 }
