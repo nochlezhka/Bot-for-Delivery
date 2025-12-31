@@ -1,4 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
-import type { UserRoles } from 'pickup-point-db';
+import { user_role } from 'pickup-point-db/client';
+
 export const ROLE_KEY = 'role';
-export const Role = (role: UserRoles | UserRoles[]) => SetMetadata(ROLE_KEY, role);
+export const Role = (role: user_role | user_role[]) =>
+  SetMetadata(ROLE_KEY, role);

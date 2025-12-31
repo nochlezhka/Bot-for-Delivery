@@ -7,7 +7,6 @@ import { PrismaClient } from 'pickup-point-db/client';
 export class PrismaDb extends PrismaClient {
   constructor(cs: ConfigService) {
     super({
-      log: ['query', 'info'],
       adapter: new PrismaPg({
         connectionString: cs.getOrThrow('DATABASE_URL'),
       }),

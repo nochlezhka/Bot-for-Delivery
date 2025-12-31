@@ -2,7 +2,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
-import { ConfirmSubject } from './const';
+import { ShiftConfirmSubject } from './const';
 import {
   getSubjectConfirmData,
   getSubjectConfirmPattern,
@@ -16,7 +16,7 @@ export class ShiftConfirmUpdate {
   @Inject() private readonly db!: PrismaDb;
   @Inject() readonly logger!: Logger;
 
-  @Action(getSubjectConfirmPattern(ConfirmSubject))
+  @Action(getSubjectConfirmPattern(ShiftConfirmSubject))
   async handleShiftAction(@Ctx() ctx: Context) {
     const cbq = ctx.callbackQuery;
     const dto =

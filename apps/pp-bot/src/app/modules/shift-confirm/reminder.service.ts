@@ -3,7 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Interval } from '@nestjs/schedule';
 import { sprintf } from 'sprintf-js';
 
-import { ConfirmSubject } from './const';
+import { ShiftConfirmSubject } from './const';
 import { SendConfirmCommand } from '../../commands';
 import { PrismaDb } from '../../prisma';
 import { formatUserDate } from '../../util';
@@ -45,7 +45,9 @@ export class ReminderService {
         },
       },
     });
-    this.logger.debug(`Extracted ${userShifts.length} upcoming shifts`);
+    this.logger.debug(
+      `Extracted ${userShifts.length} upcoming shift reminders`
+    );
 
     for (const {
       shift_id,
@@ -59,11 +61,11 @@ export class ReminderService {
             new SendConfirmCommand(
               tg_id.toString(),
               sprintf(
-                'Напоминаю вам о смене %s, на которую вы записаны %',
+                'Напоминаю вам о смене %s, на которую вы записаны %s',
                 title,
                 formatUserDate(date_start)
               ),
-              ConfirmSubject,
+              ShiftConfirmSubject,
               shift_id
             )
           );

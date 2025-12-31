@@ -1,5 +1,7 @@
 import { Inject, Logger, UseGuards } from '@nestjs/common';
 import { Action, Command, Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
+import { user_role } from 'pickup-point-db/client';
+import { sprintf } from 'sprintf-js';
 import { Markup } from 'telegraf';
 
 import { AppCls } from './app.cls';
@@ -9,8 +11,18 @@ import { PrismaDb } from './prisma';
 import { Role } from './role.decorator';
 import { RoleGuard } from './role.guard';
 import { type TelegrafContext } from './type';
+import {
+  decodeSubjectAction,
+  encodeSubjectAction,
+  formatUserDate,
+  SubjectWithAction,
+} from './util';
 
-export const SHIFT_PATTERN = new RegExp(`^shift:([\w\d\-]+):(.*)$`);
+enum AppActions {
+  volunteerViewShift = 'volunteerViewShift',
+  volunteerCollapseShift = 'volunteerCollapseShift',
+  volunteerRegisterOnShift = 'volunteerRegisterOnShift',
+}
 
 @Update()
 export class AppUpdate {
@@ -52,72 +64,109 @@ export class AppUpdate {
     await ctx.reply(`Доступные команды:\n\n${commandList}`);
   }
 
-  @Role(['volunteer'])
+  @Role([user_role.volunteer, user_role.coordinator, user_role.employee])
   @UseGuards(RoleGuard)
-  @Command('shifts')
-  async onShifts(@Ctx() ctx: TelegrafContext) {
-    this.logger.log('Shifts command called');
-    const shifts = await this.shiftService.getShifts();
+  @Command('select_shifts')
+  async selectShiftListing(@Ctx() ctx: TelegrafContext) {
+    const user_id = this.appCls.get('user.id')!;
+    const shifts = await this.db.user_shifts_table.findMany({
+      //@TODO: заменить вывод "моих смен" на смены пункта выдачи после настройки пунктов выдачи
+      select: {
+        shift: {
+          select: {
+            title: true,
+            date_start: true,
+            id: true,
+          },
+        },
+      },
+      where: {
+        AND: [
+          {
+            OR: [{ status: true }, { status: null }],
+          },
+          {
+            user_id,
+          },
+        ],
+      },
+      orderBy: {
+        shift: {
+          date_start: 'asc',
+        },
+      },
+    });
 
-    if (shifts.length == 0) {
-      const text = 'No upcoming shifts';
-      await ctx.reply(text);
-      return;
+    let keyboard = undefined;
+    let text = 'No upcoming shifts';
+
+    if (shifts.length > 0) {
+      keyboard = Markup.inlineKeyboard(
+        shifts.map(({ shift }) => [
+          Markup.button.callback(
+            sprintf(`%s ⬇️`, formatUserDate(shift.date_start)),
+            encodeSubjectAction(AppActions.volunteerViewShift, shift.id)
+          ),
+        ])
+      );
+      text = 'Available Shifts:';
     }
 
-    const keyboard = Markup.inlineKeyboard(
-      shifts.map((s) => [
-        Markup.button.callback(`${s.title} ⬇️`, `shift:${s.id}:expand`),
-      ])
-    );
-
-    this.logger.log('action: ', `shift:${shifts[0].id}:expand`);
-
-    const text = 'Available Shifts:';
     await ctx.reply(text, keyboard);
   }
 
-  // @Role(['volunteer'])
-  // @UseGuards(RoleGuard)
-  @Action(/^shift:([\w\d-]+):(.*)$/)
-  async expandShift(@Ctx() ctx: TelegrafContext) {
-    const shiftId = ctx.match![0];
-    const action = ctx.match![1];
-    const shift = await this.db.shift.findUnique({ where: { id: shiftId } });
+  @Role([user_role.volunteer, user_role.coordinator, user_role.employee])
+  @UseGuards(RoleGuard)
+  @Action(SubjectWithAction(AppActions.volunteerViewShift))
+  async volunteerViewShift(@Ctx() ctx: TelegrafContext) {
+    const cbq = ctx.callbackQuery;
+    const dto =
+      cbq && 'data' in cbq && cbq.data ? decodeSubjectAction(cbq.data) : null;
+    if (dto) {
+      const shift = await this.db.shift.findUnique({ where: { id: dto.subj } });
 
-    if (shift) {
-      const text =
-        `*${shift.title}* (${shift.date_start}–${shift.date_end})\n` +
-        `📍 *Status:* ${shift.status}\n`;
+      if (shift) {
+        const text = sprintf(
+          `*%s*\nначало: %s\nконец: %s`,
+          shift.status,
+          formatUserDate(shift.date_start),
+          formatUserDate(shift.date_end)
+        );
 
-      await ctx.editMessageText(text, {
-        parse_mode: 'Markdown',
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: 'Collapse ⬆️',
-                callback_data: `shift:${shiftId}:collapse`,
-              },
+        await ctx.editMessageText(text, {
+          parse_mode: 'Markdown',
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: 'Collapse ⬆️',
+                  callback_data: encodeSubjectAction(
+                    AppActions.volunteerCollapseShift,
+                    shift.id
+                  ),
+                },
+              ],
+              [
+                {
+                  text: 'Register',
+                  callback_data: encodeSubjectAction(
+                    AppActions.volunteerRegisterOnShift,
+                    shift.id
+                  ),
+                },
+              ],
             ],
-            [
-              {
-                text: 'Register',
-                callback_data: `shift:${shiftId}:register`,
-              },
-            ],
-          ],
-        },
-      });
+          },
+        });
 
-      await ctx.answerCbQuery();
-    } else {
-      this.logger.error(`Shift with ID ${shiftId} not found`);
-      await ctx.answerCbQuery('❌ Shift not found');
+        await ctx.answerCbQuery();
+      } else {
+        this.logger.warn(`Shift with ID  not found: ${JSON.stringify(dto)}`);
+        await ctx.answerCbQuery('❌ Shift not found');
+      }
     }
   }
 
-  // Generic text handler should be last!
   @On('text')
   async onText(@Ctx() ctx: TelegrafContext) {
     this.logger.debug('Text received');

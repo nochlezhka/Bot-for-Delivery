@@ -1,10 +1,9 @@
+import { user_role } from 'pickup-point-db/client';
 import { Scenes } from 'telegraf';
 
-import type { UserRoles } from 'pickup-point-db';
-
 export type RegisteredUser = {
-  id: number;
-  role: UserRoles;
+  id: string;
+  role: user_role;
   tgId: number;
 };
 

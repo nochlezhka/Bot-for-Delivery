@@ -28,7 +28,7 @@ export class UserMiddleware implements MiddlewareObj<TelegrafContext> {
 
         if (user && user.tg_id) {
           this.appCls.set('user', {
-            id: Number(user.id),
+            id: user.id,
             role: user.role,
             tgId: Number(user.tg_id),
           });
