@@ -5,6 +5,8 @@ export const decodeSubjectAction = (encodedData: string) => {
     action,
   };
 };
-export const encodeSubjectAction = (subjectAction: string, subject: string) =>
-  `${subjectAction}:${subject}`;
+export const encodeSubjectAction = (
+  subjectAction: string,
+  subject: string | number
+) => `${subjectAction}:${subject}`;
 export const SubjectWithAction = (subj: string) => new RegExp(`^${subj}:(.+)$`);

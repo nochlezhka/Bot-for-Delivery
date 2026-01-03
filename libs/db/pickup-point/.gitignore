@@ -3,3 +3,4 @@ esm/*
 cjs/*
 !cjs/index.ts
 dist*
+src/prisma
