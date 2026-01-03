@@ -1,9 +1,9 @@
 'use client';
 
+import { Noop } from '@util/types';
 import { useForm } from 'react-hook-form';
 
 import { VolunteerShift } from '@/entity/shift/types';
-import { Noop } from '@/shared/types';
 
 interface CoordinatorShiftFormProps {
   shift: VolunteerShift;

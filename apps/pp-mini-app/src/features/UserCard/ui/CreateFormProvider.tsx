@@ -8,7 +8,7 @@ import z from 'zod';
 import { createRequestSchema } from '@/api/user/schema';
 import { createUserResolver } from '@/entity/user/resolver';
 
-import type { Noop } from '@/shared/types';
+import type { Noop } from '@util/types';
 import type { users } from 'pickup-point-db/browser';
 
 import { UserFormContext } from '../Context';

@@ -1,11 +1,10 @@
 import { Portal } from '@ark-ui/react/portal';
 import { ListCollection, Select } from '@ark-ui/react/select';
+import { Noop } from '@util/types';
 import { clsx } from 'clsx';
 import { Check, ChevronDown } from 'lucide-react';
 
 import type { HTMLProps } from 'react';
-
-import { Noop } from '../types';
 
 interface SelectMenuProps extends Omit<HTMLProps<HTMLDivElement>, 'onChange'> {
   value?: string;

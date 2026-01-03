@@ -47,6 +47,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/util/types"
+    },
+    {
       "path": "../../libs/db/pickup-point"
     }
   ]

@@ -1,8 +1,7 @@
 'use client';
+import { Noop } from '@util/types';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
-
-import { Noop } from '@/shared/types';
 
 import type { user_role } from 'pickup-point-db/browser';
 

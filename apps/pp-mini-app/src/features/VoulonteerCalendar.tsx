@@ -1,5 +1,6 @@
 'use client';
 
+import { Noop } from '@util/types';
 import { addMonths } from 'date-fns/addMonths';
 import { endOfMonth } from 'date-fns/endOfMonth';
 import { forwardRef, useImperativeHandle, useMemo } from 'react';
@@ -12,7 +13,6 @@ import {
   isAcceptAvailable,
   shiftKeyByDate,
 } from '@/entity/shift/util';
-import { Noop } from '@/shared/types';
 import { TelegramCalendar } from '@/shared/ui/TelegramCalendar';
 import { api } from '@/trpc/client';
 

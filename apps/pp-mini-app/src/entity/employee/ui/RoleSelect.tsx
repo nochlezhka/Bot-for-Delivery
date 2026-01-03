@@ -1,9 +1,9 @@
 import { createListCollection } from '@ark-ui/react/collection';
+import { Noop } from '@util/types';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
 
 import { ROLE_LIST, ROLE_NAMES } from '@/entity/employee/constant';
-import { Noop } from '@/shared/types';
 import { SelectMenu } from '@/shared/ui/SelectMenu';
 
 import type { user_role } from 'pickup-point-db/browser';

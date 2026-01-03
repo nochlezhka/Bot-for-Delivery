@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Noop } from '@util/types';
 import { Controller, useForm } from 'react-hook-form';
 
 import { volunteerShiftSchema } from '@/entity/shift/schema';
@@ -9,7 +10,6 @@ import { AcceptTimeout } from '@/entity/shift/ui/AcceptTimeout';
 import { FreeNotice } from '@/entity/shift/ui/FreeNotice';
 import { HalfBusyNotice } from '@/entity/shift/ui/HalfBusyNotice';
 import { isAcceptAvailable } from '@/entity/shift/util';
-import { Noop } from '@/shared/types';
 import { api } from '@/trpc/client';
 
 const resolver = zodResolver(volunteerShiftSchema);

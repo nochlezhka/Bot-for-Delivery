@@ -1,12 +1,11 @@
 import { DatePicker, useDatePicker, UseDatePickerReturn } from '@ark-ui/react';
 import { CalendarDate, fromDate, now } from '@internationalized/date';
+import { Noop } from '@util/types';
 import { ValueChangeDetails } from '@zag-js/date-picker';
 import { clsx } from 'clsx';
 import { startOfDay } from 'date-fns/startOfDay';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useMemo } from 'react';
-
-import { Noop } from '@/shared/types';
 
 interface TelegramCalendarProps {
   datepicker: UseDatePickerReturn;

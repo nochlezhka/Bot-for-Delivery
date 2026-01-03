@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { updateRequestSchema } from '@/api/user/schema';
 import { updateUserResolver } from '@/entity/user/resolver';
 
-import type { Noop } from '@/shared/types';
+import type { Noop } from '@util/types';
 import type { users } from 'pickup-point-db/browser';
 
 import { UserFormContext } from '../Context';

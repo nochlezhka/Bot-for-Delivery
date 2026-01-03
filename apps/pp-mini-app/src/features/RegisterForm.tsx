@@ -1,13 +1,13 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Noop } from '@util/types';
 import clsx from 'clsx';
 import { HTMLProps } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { registerRequestSchema } from '@/api/user/schema';
 import { usePhoneMask } from '@/entity/user/hooks/use-phone.mask';
-import { Noop } from '@/shared/types';
 import { api } from '@/trpc/client';
 
 interface RegisterFormProps extends HTMLProps<HTMLFormElement> {
