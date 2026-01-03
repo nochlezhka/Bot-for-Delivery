@@ -1,15 +1,14 @@
 'use client';
 import { RadioGroup } from '@ark-ui/react/radio-group';
+import { users } from 'pickup-point-db/browser';
 import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { GENDER_NAMES, GENDER_VALUES } from '@/entity/user/constant';
 import { UserFormContext } from '@/features/UserCard/Context';
 
-import type { User } from 'pickup-point-db';
-
 export const GenderField = () => {
-  const { control } = useFormContext<User>();
+  const { control } = useFormContext<users>();
   const { field, fieldState } = useController({ name: 'gender', control });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);

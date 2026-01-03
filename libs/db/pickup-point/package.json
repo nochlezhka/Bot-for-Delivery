@@ -23,34 +23,6 @@
   "nx": {
     "sourceRoot": "libs/db/pickup-point/src",
     "targets": {
-      "build:cjs": {
-        "executor": "@nx/js:swc",
-        "outputs": [
-          "{options.outputPath}"
-        ],
-        "options": {
-          "swcrc": "libs/db/pickup-point/.cjs.swcrc",
-          "outputPath": "libs/db/pickup-point/dist-cjs",
-          "main": "libs/db/pickup-point/src/index.ts",
-          "tsConfig": "libs/db/pickup-point/tsconfig.cjs.json",
-          "skipTypeCheck": true,
-          "stripLeadingPaths": true
-        }
-      },
-      "build:esm": {
-        "executor": "@nx/js:swc",
-        "outputs": [
-          "{options.outputPath}"
-        ],
-        "options": {
-          "swcrc": "libs/db/pickup-point/.esm.swcrc",
-          "outputPath": "libs/db/pickup-point/dist-esm",
-          "main": "libs/db/pickup-point/src/index.ts",
-          "tsConfig": "libs/db/pickup-point/tsconfig.esm.json",
-          "skipTypeCheck": true,
-          "stripLeadingPaths": true
-        }
-      },
       "prisma:pull": {
         "executor": "nx:run-commands",
         "options": {

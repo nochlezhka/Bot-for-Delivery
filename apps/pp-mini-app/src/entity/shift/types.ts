@@ -1,11 +1,11 @@
-import { ShiftStatus } from 'pickup-point-db';
+import { shift_status } from 'pickup-point-db/browser';
 import { z } from 'zod';
 
 import { volunteerShiftSchema } from './schema';
 
 export interface ShiftPublicInfo {
   id: string;
-  status: ShiftStatus;
+  status: shift_status;
   accepted?: boolean | null;
 }
 

@@ -9,11 +9,11 @@ import { createRequestSchema } from '@/api/user/schema';
 import { createUserResolver } from '@/entity/user/resolver';
 
 import type { Noop } from '@/shared/types';
-import type { NewUser } from 'pickup-point-db';
+import type { users } from 'pickup-point-db/browser';
 
 import { UserFormContext } from '../Context';
 
-type formData = NewUser;
+type formData = users;
 type formResult = z.infer<typeof createRequestSchema>;
 
 export interface CreateFormProviderProps

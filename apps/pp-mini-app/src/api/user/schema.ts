@@ -1,14 +1,13 @@
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { user_gender, user_role } from 'pickup-point-db/client';
 import { z } from 'zod';
-
-import type { Gender, UserRoles } from 'pickup-point-db';
 
 export const registerRequestSchema = z.object({
   phone: z.string({ message: 'Номер телефона обязателен' }).refine((phone) => {
     const res = parsePhoneNumberFromString(phone);
     return res && res.isValid();
   }, 'Введите корректный номер телефона'),
-  gender: z.enum(['female', 'male'] as const satisfies Array<Gender>, {
+  gender: z.enum(['female', 'male'] as const satisfies Array<user_gender>, {
     message: 'Необходимо указать пол',
   }),
 });
@@ -17,15 +16,15 @@ export const createRequestSchema = z.object({
   name: z
     .string({ message: 'Необходимо указать Имя' })
     .nonempty({ message: 'Необходимо указать Имя' }),
-  gender: z.enum(['female', 'male'] as const satisfies Array<Gender>, {
+  gender: z.enum(['female', 'male'] as const satisfies Array<user_gender>, {
     message: 'Необходимо указать пол',
   }),
   phone: z.string({ message: 'Номер телефона обязателен' }).refine((phone) => {
     const res = parsePhoneNumberFromString(phone);
     return res && res.isValid();
   }, 'Введите корректный номер телефона'),
-  tgUsername: z.string().nullable(),
-  tgId: z
+  tg_username: z.string().nullable(),
+  tg_id: z
     .string()
     .or(z.bigint())
     .nullable()
@@ -36,7 +35,7 @@ export const createRequestSchema = z.object({
       'guest',
       'volunteer',
       'coordinator',
-    ] as const satisfies Array<UserRoles>,
+    ] as const satisfies Array<user_role>,
     {
       message: 'Необходимо указать роль',
     }

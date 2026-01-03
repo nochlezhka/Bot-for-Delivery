@@ -4,13 +4,13 @@ import { HTMLProps } from 'react';
 
 import { Noop } from '@/shared/types';
 
-import type { UserRoles } from 'pickup-point-db';
+import type { user_role } from 'pickup-point-db/browser';
 
 import { ROLE_LIST, ROLE_NAMES } from '../constant';
 
 interface RoleChipsProps extends Omit<HTMLProps<HTMLDivElement>, 'onChange'> {
-  defaultSelected: UserRoles;
-  onChange?: (role: UserRoles) => ReturnType<Noop>;
+  defaultSelected: user_role;
+  onChange?: (role: user_role) => ReturnType<Noop>;
 }
 
 export const RoleChips = ({
@@ -18,7 +18,7 @@ export const RoleChips = ({
   onChange,
   className,
 }: RoleChipsProps) => {
-  const selectAciton = (val: UserRoles) => {
+  const selectAciton = (val: user_role) => {
     if (onChange) {
       onChange(val);
     }

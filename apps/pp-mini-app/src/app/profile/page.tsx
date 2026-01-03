@@ -8,9 +8,9 @@ export default function ProfilePage() {
   const username = useMemo(
     () =>
       data
-        ? data.tgUsername
-          ? data.tgUsername
-          : '@id' + data.tgId?.toString()
+        ? data.tg_username
+          ? data.tg_username
+          : '@id' + data.tg_id?.toString()
         : null,
     [data]
   );

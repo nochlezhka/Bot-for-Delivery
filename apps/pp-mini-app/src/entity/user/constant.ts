@@ -1,7 +1,7 @@
-import type { Gender } from 'pickup-point-db';
+import type { user_gender } from 'pickup-point-db/browser';
 
-export const GENDER_NAMES: Record<Gender, string> = {
+export const GENDER_NAMES: Record<user_gender, string> = {
   female: 'Женский',
   male: 'Мужской',
 };
-export const GENDER_VALUES: Array<Gender> = ['female', 'male'];
+export const GENDER_VALUES: Array<user_gender> = ['female', 'male'];

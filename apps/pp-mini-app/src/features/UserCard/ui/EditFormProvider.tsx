@@ -8,11 +8,11 @@ import { updateRequestSchema } from '@/api/user/schema';
 import { updateUserResolver } from '@/entity/user/resolver';
 
 import type { Noop } from '@/shared/types';
-import type { User } from 'pickup-point-db';
+import type { users } from 'pickup-point-db/browser';
 
 import { UserFormContext } from '../Context';
 
-type formData = Partial<User> & { id: string };
+type formData = Omit<users, 'pickup_id'> & { id: string };
 type formResult = z.infer<typeof updateRequestSchema>;
 
 export interface EditFormProviderProps
@@ -34,26 +34,27 @@ export const EditFormProvider = ({
     resolver: updateUserResolver,
   });
 
-  const submitAction: (v?: keyof User) => ReturnType<Noop> = useMemo(
-    () => (key) => {
-      form.handleSubmit(
-        (data) => {
-          let result = data;
-          if (key) {
-            result = pick(data, [key, 'id']);
+  const submitAction: (v?: keyof Omit<users, 'pickup_id'>) => ReturnType<Noop> =
+    useMemo(
+      () => (key) => {
+        form.handleSubmit(
+          (data) => {
+            let result = data;
+            if (key) {
+              result = pick(data, [key, 'id']);
+            }
+            onSubmit?.(result);
+          },
+          () => {
+            if (autoresetOnError) {
+              //TODO: доработь авторесет
+              form.reset(defaultValues, { keepErrors: true });
+            }
           }
-          onSubmit?.(result);
-        },
-        () => {
-          if (autoresetOnError) {
-            //TODO: доработь авторесет
-            form.reset(defaultValues, { keepErrors: true });
-          }
-        }
-      )();
-    },
-    [autoresetOnError, defaultValues, form, onSubmit]
-  );
+        )();
+      },
+      [autoresetOnError, defaultValues, form, onSubmit]
+    );
 
   return (
     <FormProvider {...form}>

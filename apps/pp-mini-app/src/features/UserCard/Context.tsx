@@ -1,10 +1,10 @@
 'use client';
 import { createContext } from 'react';
 
-import type { User } from 'pickup-point-db';
+import type { users } from 'pickup-point-db/browser';
 
 export const UserFormContext = createContext({
-  trigerFieldSubmit: (field: keyof User) => {
+  trigerFieldSubmit: (field: keyof Omit<users, 'pickup_id'>) => {
     //pass
   },
 });

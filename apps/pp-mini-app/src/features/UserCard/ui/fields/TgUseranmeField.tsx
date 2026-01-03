@@ -5,13 +5,13 @@ import { useController, useFormContext } from 'react-hook-form';
 
 import { useTgLinkMask } from '@/entity/user/hooks/use-tg-link.mask';
 
-import type { User } from 'pickup-point-db';
+import type { users } from 'pickup-point-db/browser';
 
 import { UserFormContext } from '../../Context';
 
 export const TgUseranmeField = () => {
-  const { control } = useFormContext<User>();
-  const { field, fieldState } = useController({ name: 'tgUsername', control });
+  const { control } = useFormContext<users>();
+  const { field, fieldState } = useController({ name: 'tg_username', control });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);
   const maskedInput = useTgLinkMask();
@@ -23,7 +23,7 @@ export const TgUseranmeField = () => {
         className="form-control"
         placeholder="Введите ссылку на пользователя"
         defaultValue={field.value ?? ''}
-        onValueCommit={trigerFieldSubmit.bind(null, 'tgUsername')}
+        onValueCommit={trigerFieldSubmit.bind(null, 'tg_username')}
         onValueChange={({ value }) => field.onChange(value)}
       >
         <Editable.Preview className="input input-bordered w-full data-[placeholder-shown]:text-base-content/30" />

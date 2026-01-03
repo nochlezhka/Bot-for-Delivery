@@ -1,51 +1,55 @@
 import { endOfMonth } from 'date-fns/endOfMonth';
 import { startOfDay } from 'date-fns/startOfDay';
 import { startOfMonth } from 'date-fns/startOfMonth';
-import { and, asc, between, eq, gte, isNotNull } from 'drizzle-orm/expressions';
-import { connectionFactory, schema, ShiftStatus } from 'pickup-point-db';
+import { shift, shift_status } from 'pickup-point-db/browser';
+import { shiftGetPayload } from 'pickup-point-db/models';
 
 import { shiftKeyByDate } from '@/entity/shift/util';
+import { prisma } from '@/server/db';
 
-export const getCalendarShifts = async (
-  db: ReturnType<typeof connectionFactory>,
-  {
-    dateStart,
-    dateEnd,
-    userId,
-  }: {
-    dateStart?: Date;
-    dateEnd?: Date;
-    userId: string;
-  }
-) => {
+export const getCalendarShifts = async ({
+  dateStart,
+  dateEnd,
+  userId,
+}: {
+  dateStart?: Date;
+  dateEnd?: Date;
+  userId: string;
+}) => {
   const currentDate = new Date();
-  const data = await db
-    .select()
-    .from(schema.shiftTable)
-    .leftJoin(
-      schema.userShiftsTable,
-      eq(schema.shiftTable.id, schema.userShiftsTable.shiftId)
-    )
-    .where(
-      between(
-        schema.shiftTable.dateStart,
-        dateStart ?? startOfMonth(currentDate),
-        dateEnd ?? endOfMonth(currentDate)
-      )
-    );
+  const data = await prisma.shift.findMany({
+    select: {
+      id: true,
+      status: true,
+      date_start: true,
+      user_shifts_table: true,
+    },
+    where: {
+      date_start: {
+        gte: dateStart ?? startOfMonth(currentDate),
+      },
+      date_end: {
+        lt: dateEnd ?? endOfMonth(currentDate),
+      },
+    },
+  });
   return Array.from(
     data
       .reduce(
-        (acc, { shift: { id, status, dateStart }, user_shifts_table }) => {
+        (acc, { id, status, date_start: dateStart, user_shifts_table }) => {
           const key = shiftKeyByDate(dateStart);
           const shift = acc.get(key) ?? {
             id,
             dateStart,
             status,
           };
-          if (user_shifts_table && userId === user_shifts_table.userId) {
-            shift.accepted = user_shifts_table.status;
+          for (const userShift of user_shifts_table) {
+            if (userId === userShift.user_id) {
+              shift.accepted = userShift.status;
+              break;
+            }
           }
+
           acc.set(key, shift);
           return acc;
         },
@@ -53,7 +57,7 @@ export const getCalendarShifts = async (
           number,
           {
             id: string;
-            status: ShiftStatus;
+            status: shift_status;
             dateStart: Date;
             accepted?: boolean | null;
           }
@@ -63,40 +67,43 @@ export const getCalendarShifts = async (
   );
 };
 
-export const getOwnShiftList = async (
-  db: ReturnType<typeof connectionFactory>,
-  {
-    userId,
-  }: {
-    userId: string;
-  }
-) => {
+export const getOwnShiftList = async ({ userId }: { userId: string }) => {
   const currentDate = new Date();
-  const data = await db
-    .select()
-    .from(schema.shiftTable)
-    .leftJoin(
-      schema.userShiftsTable,
-      eq(schema.shiftTable.id, schema.userShiftsTable.shiftId)
-    )
-    .where(
-      and(
-        gte(schema.shiftTable.dateStart, startOfDay(currentDate)),
-        eq(schema.userShiftsTable.userId, userId),
-        isNotNull(schema.userShiftsTable.status)
-      )
-    )
-    .orderBy(asc(schema.shiftTable.dateStart));
+  const data = await prisma.shift.findMany({
+    select: {
+      id: true,
+      status: true,
+      date_start: true,
+      user_shifts_table: true,
+    },
+    where: {
+      date_start: {
+        gte: startOfDay(currentDate),
+      },
+      user_shifts_table: {
+        every: {
+          user_id: userId,
+          status: { not: null },
+        },
+      },
+    },
+    orderBy: {
+      date_start: 'asc',
+    },
+  });
   return Array.from(
     data
       .reduce(
-        (acc, { shift: { id, status, dateStart }, user_shifts_table }) => {
+        (acc, { id, status, date_start: dateStart, user_shifts_table }) => {
           const shift = acc.get(id) ?? {
             status,
             dateStart,
           };
-          if (user_shifts_table && userId === user_shifts_table.userId) {
-            shift.accepted = user_shifts_table.status;
+          for (const userShift of user_shifts_table) {
+            if (userId === userShift.user_id) {
+              shift.accepted = userShift.status;
+              break;
+            }
           }
           acc.set(id, shift);
           return acc;
@@ -105,7 +112,7 @@ export const getOwnShiftList = async (
           string,
           {
             dateStart: Date;
-            status: ShiftStatus;
+            status: shift_status;
             accepted?: boolean | null;
           }
         >()
@@ -114,26 +121,50 @@ export const getOwnShiftList = async (
   );
 };
 
-type ShiftsWithUsers = {
-  shift: typeof schema.shiftTable.$inferSelect;
-  userShift: typeof schema.userShiftsTable.$inferSelect | null;
-}[];
-const castShiftsArrayToShift = (res: ShiftsWithUsers) => {
+export const shiftByDates = async ({
+  dateStart,
+  dateEnd,
+}: {
+  dateStart: Date;
+  dateEnd: Date;
+}) => {
+  const res = await prisma.shift.findMany({
+    where: {
+      date_start: {
+        gte: dateStart,
+      },
+      date_end: {
+        lt: dateEnd,
+      },
+    },
+    include: {
+      user_shifts_table: {
+        select: {
+          user_id: true,
+          status: true,
+        },
+      },
+    },
+  });
+
   const result = res.reduce(
-    (acc, { shift, userShift }) => {
+    (acc, { user_shifts_table, ...shift }) => {
       const cur = acc.get(shift.id) ?? {
         ...shift,
         users: {} as Record<string, boolean | null>,
       };
-      if (userShift) {
-        cur.users[userShift.userId] = userShift.status;
+
+      for (const userShift of user_shifts_table) {
+        if (userShift) {
+          cur.users[userShift.user_id] = userShift.status;
+        }
       }
       acc.set(shift.id, cur);
       return acc;
     },
     new Map<
       string,
-      typeof schema.shiftTable.$inferSelect & {
+      shiftGetPayload<{ select: Record<keyof shift, true> }> & {
         users: Record<string, boolean | null>;
       }
     >()
@@ -141,54 +172,51 @@ const castShiftsArrayToShift = (res: ShiftsWithUsers) => {
   const vals = Array.from(result.values());
   return vals.length > 0 ? vals[0] : null;
 };
-export const shiftByDates = (
-  db: ReturnType<typeof connectionFactory>,
-  {
-    dateStart,
-    dateEnd,
-  }: {
-    dateStart: Date;
-    dateEnd: Date;
-  }
-) =>
-  db
-    .select({
-      shift: schema.shiftTable,
-      userShift: schema.userShiftsTable,
-    })
-    .from(schema.shiftTable)
-    .leftJoin(
-      schema.userShiftsTable,
-      eq(schema.shiftTable.id, schema.userShiftsTable.shiftId)
-    )
-    .where(({ shift }) =>
-      and(eq(shift.dateStart, dateStart), eq(shift.dateEnd, dateEnd))
-    )
-    .execute()
-    .then(castShiftsArrayToShift);
 
-type UsersShiftsWithUsers = {
-  shift: typeof schema.shiftTable.$inferSelect | null;
-  userShift: typeof schema.userShiftsTable.$inferSelect;
-}[];
-const castUsersShiftsArrayToShift = (res: UsersShiftsWithUsers) => {
+export const shiftByIdAndUser = async ({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: string;
+}) => {
+  const res = await prisma.shift.findMany({
+    include: {
+      user_shifts_table: {
+        select: {
+          user_id: true,
+          status: true,
+        },
+      },
+    },
+    where: {
+      id,
+      user_shifts_table: {
+        some: {
+          user_id: userId,
+        },
+      },
+    },
+  });
+
   const result = res.reduce(
-    (acc, { shift, userShift }) => {
+    (acc, { user_shifts_table, ...shift }) => {
       if (shift) {
         const cur = acc.get(shift.id) ?? {
           ...shift,
           users: {} as Record<string, boolean | null>,
         };
-        if (userShift) {
-          cur.users[userShift.userId] = userShift.status;
+        for (const userShift of user_shifts_table) {
+          cur.users[userShift.user_id] = userShift.status;
         }
+
         acc.set(shift.id, cur);
       }
       return acc;
     },
     new Map<
       string,
-      typeof schema.shiftTable.$inferSelect & {
+      shiftGetPayload<{ select: Record<keyof shift, true> }> & {
         users: Record<string, boolean | null>;
       }
     >()
@@ -196,28 +224,3 @@ const castUsersShiftsArrayToShift = (res: UsersShiftsWithUsers) => {
   const vals = Array.from(result.values());
   return vals.length > 0 ? vals[0] : null;
 };
-export const shiftByIdAndUser = (
-  db: ReturnType<typeof connectionFactory>,
-  {
-    id,
-    userId,
-  }: {
-    id: string;
-    userId: string;
-  }
-) =>
-  db
-    .select({
-      shift: schema.shiftTable,
-      userShift: schema.userShiftsTable,
-    })
-    .from(schema.userShiftsTable)
-    .leftJoin(
-      schema.shiftTable,
-      eq(schema.userShiftsTable.shiftId, schema.shiftTable.id)
-    )
-    .where(({ userShift }) =>
-      and(eq(userShift.shiftId, id), eq(userShift.userId, userId))
-    )
-    .execute()
-    .then(castUsersShiftsArrayToShift);

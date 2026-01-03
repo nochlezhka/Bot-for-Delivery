@@ -5,10 +5,10 @@ import { useController, useFormContext } from 'react-hook-form';
 import { RoleSelect } from '@/entity/employee/ui';
 import { UserFormContext } from '@/features/UserCard/Context';
 
-import type { User } from 'pickup-point-db';
+import type { users } from 'pickup-point-db/browser';
 
 export const RoleField = () => {
-  const { control } = useFormContext<User>();
+  const { control } = useFormContext<users>();
   const { field, fieldState } = useController({ name: 'role', control });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);

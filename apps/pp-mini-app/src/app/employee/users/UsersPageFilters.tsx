@@ -5,10 +5,10 @@ import { HTMLProps } from 'react';
 import { NewUserDialog } from '@/app/employee/users/NewUserDialog';
 import { RoleChips } from '@/entity/employee/ui';
 
-import type { UserRoles } from 'pickup-point-db';
+import type { user_role } from 'pickup-point-db/browser';
 
 const DEFAULT_SELECTED = 'volunteer';
-const current = atom<UserRoles>(DEFAULT_SELECTED);
+const current = atom<user_role>(DEFAULT_SELECTED);
 
 type UsersPageFiltersProps = HTMLProps<HTMLDivElement>;
 export const UsersPageFilters = ({ className }: UsersPageFiltersProps) => {

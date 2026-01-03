@@ -1,6 +1,4 @@
 import { TRPCError } from '@trpc/server';
-import { and, eq } from 'drizzle-orm/expressions';
-import { schema } from 'pickup-point-db';
 
 import {
   castShiftDateTime,
@@ -20,7 +18,7 @@ export const shiftsRouter = createTRPCRouter({
   getCalendarShifts: volunteerProcedure
     .input(shiftRangeRequest)
     .query(async ({ ctx, input: { end, start } }) =>
-      getCalendarShifts(ctx.db, {
+      getCalendarShifts({
         userId: ctx.dbUser.id,
         dateEnd: end,
         dateStart: start,
@@ -32,7 +30,7 @@ export const shiftsRouter = createTRPCRouter({
       const dateStart = castShiftDateTime(selectedDate);
       const dateEnd = createShiftEndTimeByStart(dateStart);
 
-      const foundedShift = await shiftByDates(db, { dateStart, dateEnd });
+      const foundedShift = await shiftByDates({ dateStart, dateEnd });
       if (foundedShift) {
         if (typeof foundedShift.users[dbUser.id] === 'boolean') {
           throw new TRPCError({
@@ -61,61 +59,62 @@ export const shiftsRouter = createTRPCRouter({
     })
     .mutation(
       async ({ ctx: { db, dbUser, dateEnd, dateStart, foundedShift } }) => {
-        await db.transaction(async (tx) => {
+        await db.$transaction(async (tx) => {
           let shiftId;
           if (foundedShift) {
             shiftId = foundedShift.id;
-            await tx
-              .update(schema.shiftTable)
-              .set({
+            tx.shift.update({
+              data: {
                 status: foundedShift.status === 'free' ? 'halfBusy' : 'busy',
-              })
-              .where(eq(schema.shiftTable.id, shiftId));
-          } else {
-            const [res] = await tx
-              .insert(schema.shiftTable)
-              .values([
-                {
-                  title: 'Рабочая смена',
-                  status: 'halfBusy',
-                  dateEnd,
-                  dateStart,
-                },
-              ])
-              .returning({ createdShiftId: schema.shiftTable.id });
-            shiftId = res.createdShiftId;
-          }
-          await tx
-            .insert(schema.userShiftsTable)
-            .values([
-              {
-                userId: dbUser.id,
-                shiftId,
-                status: false,
               },
-            ])
-            .onConflictDoUpdate({
-              target: [
-                schema.userShiftsTable.userId,
-                schema.userShiftsTable.shiftId,
-              ],
-              set: {
-                status: false,
+              where: {
+                id: shiftId,
               },
             });
+          } else {
+            shiftId = (
+              await tx.shift.create({
+                data: {
+                  title: 'Рабочая смена',
+                  status: 'halfBusy',
+                  date_end: dateEnd,
+                  date_start: dateStart,
+                },
+                select: {
+                  id: true,
+                },
+              })
+            ).id;
+          }
+          await tx.user_shifts_table.upsert({
+            create: {
+              user_id: dbUser.id,
+              shift_id: shiftId,
+              status: false,
+            },
+            update: {
+              status: null,
+            },
+            where: {
+              user_id_shift_id: {
+                user_id: dbUser.id,
+                shift_id: shiftId,
+              },
+            },
+          });
         });
       }
     ),
 
   getOwnShifts: volunteerProcedure.query(async ({ ctx }) =>
-    getOwnShiftList(ctx.db, {
+    getOwnShiftList({
       userId: ctx.dbUser.id,
     })
   ),
   accept: volunteerProcedure
     .input(shiftAction)
     .use(async ({ next, input: { id }, ctx: { db, dbUser } }) => {
-      const foundedShift = await shiftByIdAndUser(db, {
+      const foundedShift = await shiftByIdAndUser({
         id,
         userId: dbUser.id,
       });
@@ -141,20 +140,22 @@ export const shiftsRouter = createTRPCRouter({
       return next();
     })
     .mutation(async ({ input: { id }, ctx: { db, dbUser } }) => {
-      await db
-        .update(schema.userShiftsTable)
-        .set({ status: true })
-        .where(
-          and(
-            eq(schema.userShiftsTable.shiftId, id),
-            eq(schema.userShiftsTable.userId, dbUser.id)
-          )
-        );
+      await db.user_shifts_table.update({
+        data: {
+          status: true,
+        },
+        where: {
+          user_id_shift_id: {
+            shift_id: id,
+            user_id: dbUser.id,
+          },
+        },
+      });
     }),
   cancel: volunteerProcedure
     .input(shiftAction)
     .use(async ({ next, input: { id }, ctx: { db, dbUser } }) => {
-      const foundedShift = await shiftByIdAndUser(db, {
+      const foundedShift = await shiftByIdAndUser({
         id,
         userId: dbUser.id,
       });
@@ -180,27 +181,37 @@ export const shiftsRouter = createTRPCRouter({
       return next({ ctx: { foundedShift } });
     })
     .mutation(async ({ input: { id }, ctx: { db, dbUser, foundedShift } }) => {
-      await db.transaction(async (tx) => {
+      await db.$transaction(async (tx) => {
         if (foundedShift.status === 'halfBusy') {
-          await tx
-            .update(schema.shiftTable)
-            .set({ status: 'free' })
-            .where(eq(schema.shiftTable.id, id));
+          await tx.shift.update({
+            data: {
+              status: 'free',
+            },
+            where: {
+              id,
+            },
+          });
         } else if (foundedShift.status === 'busy') {
-          await tx
-            .update(schema.shiftTable)
-            .set({ status: 'halfBusy' })
-            .where(eq(schema.shiftTable.id, id));
+          await tx.shift.update({
+            data: {
+              status: 'halfBusy',
+            },
+            where: {
+              id,
+            },
+          });
         }
-        await tx
-          .update(schema.userShiftsTable)
-          .set({ status: null })
-          .where(
-            and(
-              eq(schema.userShiftsTable.shiftId, id),
-              eq(schema.userShiftsTable.userId, dbUser.id)
-            )
-          );
+        await tx.user_shifts_table.update({
+          data: {
+            status: false,
+          },
+          where: {
+            user_id_shift_id: {
+              shift_id: id,
+              user_id: dbUser.id,
+            },
+          },
+        });
       });
     }),
 });
