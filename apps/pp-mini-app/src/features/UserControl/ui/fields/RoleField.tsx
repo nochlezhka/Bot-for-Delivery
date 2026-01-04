@@ -3,9 +3,10 @@ import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { RoleSelect } from '@/entity/employee/ui';
-import { UserFormContext } from '@/features/UserCard/Context';
 
 import type { users } from 'pickup-point-db/browser';
+
+import { UserFormContext } from '../../Context';
 
 export const RoleField = () => {
   const { control } = useFormContext<users>();

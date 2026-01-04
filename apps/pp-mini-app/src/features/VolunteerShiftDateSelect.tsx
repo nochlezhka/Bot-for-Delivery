@@ -28,7 +28,7 @@ export interface VolunteerCalendarRef {
 
 const WARNNING_BORDER = createWarningBorder().getTime();
 
-export const VolunteerCalendar = forwardRef<
+export const VolunteerShiftDateSelect = forwardRef<
   VolunteerCalendarRef,
   VolunteerCalendarProps
 >(function VoulonteerCalendar(

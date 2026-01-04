@@ -5,6 +5,7 @@ import {
   createShiftEndTimeByStart,
 } from '@/entity/shift/util';
 import { createTRPCRouter, volunteerProcedure } from '@/server/api/trpc';
+import { prisma } from '@/server/db';
 
 import {
   getCalendarShifts,
@@ -26,7 +27,7 @@ export const shiftsRouter = createTRPCRouter({
     ),
   signUp: volunteerProcedure
     .input(shiftSignUpRequest)
-    .use(async ({ next, input: { selectedDate }, ctx: { db, dbUser } }) => {
+    .use(async ({ next, input: { selectedDate }, ctx: { dbUser } }) => {
       const dateStart = castShiftDateTime(selectedDate);
       const dateEnd = createShiftEndTimeByStart(dateStart);
 
@@ -57,54 +58,52 @@ export const shiftsRouter = createTRPCRouter({
         },
       });
     })
-    .mutation(
-      async ({ ctx: { db, dbUser, dateEnd, dateStart, foundedShift } }) => {
-        await db.$transaction(async (tx) => {
-          let shiftId;
-          if (foundedShift) {
-            shiftId = foundedShift.id;
-            tx.shift.update({
-              data: {
-                status: foundedShift.status === 'free' ? 'halfBusy' : 'busy',
-              },
-              where: {
-                id: shiftId,
-              },
-            });
-          } else {
-            shiftId = (
-              await tx.shift.create({
-                data: {
-                  title: 'Рабочая смена',
-                  status: 'halfBusy',
-                  date_end: dateEnd,
-                  date_start: dateStart,
-                },
-                select: {
-                  id: true,
-                },
-              })
-            ).id;
-          }
-          await tx.user_shifts_table.upsert({
-            create: {
-              user_id: dbUser.id,
-              shift_id: shiftId,
-              status: false,
-            },
-            update: {
-              status: null,
+    .mutation(async ({ ctx: { dbUser, dateEnd, dateStart, foundedShift } }) => {
+      await prisma.$transaction(async (tx) => {
+        let shiftId;
+        if (foundedShift) {
+          shiftId = foundedShift.id;
+          tx.shift.update({
+            data: {
+              status: foundedShift.status === 'free' ? 'halfBusy' : 'busy',
             },
             where: {
-              user_id_shift_id: {
-                user_id: dbUser.id,
-                shift_id: shiftId,
-              },
+              id: shiftId,
             },
           });
+        } else {
+          shiftId = (
+            await tx.shift.create({
+              data: {
+                title: 'Рабочая смена',
+                status: 'halfBusy',
+                date_end: dateEnd,
+                date_start: dateStart,
+              },
+              select: {
+                id: true,
+              },
+            })
+          ).id;
+        }
+        await tx.user_shifts_table.upsert({
+          create: {
+            user_id: dbUser.id,
+            shift_id: shiftId,
+            status: false,
+          },
+          update: {
+            status: false,
+          },
+          where: {
+            user_id_shift_id: {
+              user_id: dbUser.id,
+              shift_id: shiftId,
+            },
+          },
         });
-      }
-    ),
+      });
+    }),
 
   getOwnShifts: volunteerProcedure.query(async ({ ctx }) =>
     getOwnShiftList({
@@ -113,7 +112,7 @@ export const shiftsRouter = createTRPCRouter({
   ),
   accept: volunteerProcedure
     .input(shiftAction)
-    .use(async ({ next, input: { id }, ctx: { db, dbUser } }) => {
+    .use(async ({ next, input: { id }, ctx: { dbUser } }) => {
       const foundedShift = await shiftByIdAndUser({
         id,
         userId: dbUser.id,
@@ -139,8 +138,8 @@ export const shiftsRouter = createTRPCRouter({
       }
       return next();
     })
-    .mutation(async ({ input: { id }, ctx: { db, dbUser } }) => {
-      await db.user_shifts_table.update({
+    .mutation(async ({ input: { id }, ctx: { dbUser } }) => {
+      await prisma.user_shifts_table.update({
         data: {
           status: true,
         },
@@ -154,7 +153,7 @@ export const shiftsRouter = createTRPCRouter({
     }),
   cancel: volunteerProcedure
     .input(shiftAction)
-    .use(async ({ next, input: { id }, ctx: { db, dbUser } }) => {
+    .use(async ({ next, input: { id }, ctx: { dbUser } }) => {
       const foundedShift = await shiftByIdAndUser({
         id,
         userId: dbUser.id,
@@ -180,8 +179,8 @@ export const shiftsRouter = createTRPCRouter({
       }
       return next({ ctx: { foundedShift } });
     })
-    .mutation(async ({ input: { id }, ctx: { db, dbUser, foundedShift } }) => {
-      await db.$transaction(async (tx) => {
+    .mutation(async ({ input: { id }, ctx: { dbUser, foundedShift } }) => {
+      await prisma.$transaction(async (tx) => {
         if (foundedShift.status === 'halfBusy') {
           await tx.shift.update({
             data: {

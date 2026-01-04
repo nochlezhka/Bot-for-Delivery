@@ -5,14 +5,14 @@ import { CircleAlert } from 'lucide-react';
 import { HTMLProps } from 'react';
 import { merge, pick } from 'remeda';
 
-import { UsersPageFilters } from '@/app/employee/users/UsersPageFilters';
-import { ExistsUserCard } from '@/features/UserCard';
+import { ExistsUserCard } from '@/features/UserControl';
+import { UserRoleFilter } from '@/features/UserRoleFilter';
 import { ToastSuccess } from '@/shared/ui/Toaster';
 import { api } from '@/trpc/client';
 
 type UsersListingProps = HTMLProps<HTMLDivElement>;
 export const UsersListing = ({ className }: UsersListingProps) => {
-  const currentRole = UsersPageFilters.useCurrentRole();
+  const currentRole = UserRoleFilter.useCurrentRole();
   const [data, { refetch }] = api.eployee.getUsers.useSuspenseQuery({
     selected: currentRole,
   });

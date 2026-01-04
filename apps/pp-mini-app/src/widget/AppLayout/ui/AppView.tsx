@@ -2,7 +2,7 @@
 
 import { PropsWithChildren } from 'react';
 
-import { RegisterForm } from '@/features/RegisterForm';
+import { GuestRegister } from '@/features/GuestRegister';
 import { api } from '@/trpc/client';
 
 import { AuthenticatedView } from './AuthenticatedView';
@@ -35,7 +35,7 @@ export const AppView = ({ children }: PropsWithChildren) => {
       }
     } else if (profile === null) {
       result = (
-        <RegisterForm
+        <GuestRegister
           className="flex-grow"
           onSuccess={completeRegisterAction}
         />

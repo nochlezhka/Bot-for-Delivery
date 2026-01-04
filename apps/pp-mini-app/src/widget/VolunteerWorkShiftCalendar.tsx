@@ -4,11 +4,11 @@ import { Dialog, Portal } from '@ark-ui/react';
 import { useRef, useState } from 'react';
 
 import { VolunteerShift } from '@/entity/shift/types';
-import { VolunteerShiftForm } from '@/features/VolunteerShiftForm';
+import { VolunteerShiftControl } from '@/features/VolunteerShiftControl';
 import {
-  VolunteerCalendar,
   VolunteerCalendarRef,
-} from '@/features/VoulonteerCalendar';
+  VolunteerShiftDateSelect,
+} from '@/features/VolunteerShiftDateSelect';
 
 export function VolunteerWorkShiftCalendar() {
   const calendarRef = useRef<VolunteerCalendarRef>(null);
@@ -17,7 +17,7 @@ export function VolunteerWorkShiftCalendar() {
   );
   return (
     <>
-      <VolunteerCalendar
+      <VolunteerShiftDateSelect
         ref={calendarRef}
         onChangeValue={(value) => setSelectedShift(value)}
         onDateReset={() => setSelectedShift(null)}
@@ -39,7 +39,7 @@ export function VolunteerWorkShiftCalendar() {
               {selectedShift === null ? (
                 <></>
               ) : (
-                <VolunteerShiftForm
+                <VolunteerShiftControl
                   shift={selectedShift}
                   onActionComplete={() =>
                     calendarRef.current?.resetAndRefresh()

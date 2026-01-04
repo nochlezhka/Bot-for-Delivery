@@ -4,16 +4,15 @@ import { Portal } from '@ark-ui/react/portal';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
 
-import { NewUserCard } from '@/features/UserCard';
+import { NewUserCard } from '@/features/UserControl';
+import { UserRoleFilter } from '@/features/UserRoleFilter';
 import { ToastSuccess } from '@/shared/ui/Toaster';
 import { api } from '@/trpc/client';
-
-import { UsersPageFilters } from './UsersPageFilters';
 
 export const NewUserDialog = ({ className }: HTMLProps<HTMLDivElement>) => {
   const dialog = useDialog();
 
-  const currentRole = UsersPageFilters.useCurrentRole();
+  const currentRole = UserRoleFilter.useCurrentRole();
   const utils = api.useUtils();
 
   const { mutate: createUser } = api.eployee.createUser.useMutation({

@@ -16,7 +16,7 @@ interface RegisterFormProps extends HTMLProps<HTMLFormElement> {
 
 const resolver = zodResolver(registerRequestSchema);
 
-export const RegisterForm = ({ onSuccess, className }: RegisterFormProps) => {
+export const GuestRegister = ({ onSuccess, className }: RegisterFormProps) => {
   const { mutateAsync, isPending } = api.user.register.useMutation({
     onSuccess,
   });

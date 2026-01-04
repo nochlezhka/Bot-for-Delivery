@@ -5,7 +5,8 @@ import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { GENDER_NAMES, GENDER_VALUES } from '@/entity/user/constant';
-import { UserFormContext } from '@/features/UserCard/Context';
+
+import { UserFormContext } from '../../Context';
 
 export const GenderField = () => {
   const { control } = useFormContext<users>();

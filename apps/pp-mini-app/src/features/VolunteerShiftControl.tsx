@@ -19,7 +19,7 @@ interface VolunteerShiftFormProps {
   onActionComplete?: Noop;
 }
 
-export const VolunteerShiftForm = ({
+export const VolunteerShiftControl = ({
   shift,
   onActionComplete,
 }: VolunteerShiftFormProps) => {

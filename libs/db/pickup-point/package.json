@@ -21,6 +21,7 @@
     "prisma"
   ],
   "nx": {
+    "buildable": false,
     "sourceRoot": "libs/db/pickup-point/src",
     "targets": {
       "prisma:pull": {
@@ -35,27 +36,6 @@
         "options": {
           "command": "prisma generate --schema=./prisma/schema.prisma",
           "cwd": "libs/db/pickup-point"
-        }
-      },
-      "ci": {
-        "dependsOn": [
-          "build"
-        ],
-        "executor": "@nx-tools/nx-container:build",
-        "options": {
-          "push": true,
-          "metadata": {
-            "images": [
-              "ghcr.io/nochlezhka/Bot-for-Delivery/pickup-point-db"
-            ],
-            "tags": [
-              "type=ref,event=branch"
-            ]
-          },
-          "platforms": [
-            "linux/amd64",
-            "linux/arm64"
-          ]
         }
       }
     }
