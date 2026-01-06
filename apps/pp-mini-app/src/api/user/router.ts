@@ -46,7 +46,7 @@ export const userRouter = createTRPCRouter({
     }),
 });
 
-export const employeeRouter = createTRPCRouter({
+export const userEmployeeRouter = createTRPCRouter({
   getUsers: employeeProcedure
     .input(
       z.object({

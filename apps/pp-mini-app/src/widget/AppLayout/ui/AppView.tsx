@@ -35,10 +35,7 @@ export const AppView = ({ children }: PropsWithChildren) => {
       }
     } else if (profile === null) {
       result = (
-        <GuestRegister
-          className="flex-grow"
-          onSuccess={completeRegisterAction}
-        />
+        <GuestRegister className="grow" onSuccess={completeRegisterAction} />
       );
     }
   }

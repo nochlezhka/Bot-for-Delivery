@@ -1,8 +1,7 @@
 'use client';
 import { UserRoleFilter } from '@/features/UserRoleFilter';
-import { UsersListing } from '@/widget/UsersListing';
-
 import { NewUserDialog } from '@/widget/NewUserDialog';
+import { UsersListing } from '@/widget/UsersListing';
 
 export default function UsersPage() {
   return (

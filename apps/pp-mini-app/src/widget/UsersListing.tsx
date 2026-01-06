@@ -13,18 +13,18 @@ import { api } from '@/trpc/client';
 type UsersListingProps = HTMLProps<HTMLDivElement>;
 export const UsersListing = ({ className }: UsersListingProps) => {
   const currentRole = UserRoleFilter.useCurrentRole();
-  const [data, { refetch }] = api.eployee.getUsers.useSuspenseQuery({
+  const [data, { refetch }] = api.eployee.user.getUsers.useSuspenseQuery({
     selected: currentRole,
   });
 
   const queryClient = useQueryClient();
-  const { mutateAsync: updateUser } = api.eployee.updateUser.useMutation({
+  const { mutateAsync: updateUser } = api.eployee.user.updateUser.useMutation({
     onSuccess: async () => {
       ToastSuccess({ text: 'Пользователь обновлен!' });
       await refetch();
       await queryClient.invalidateQueries({
         queryKey: getQueryKey(
-          api.eployee.getUsers,
+          api.eployee.user.getUsers,
           {
             selected: currentRole,
           },

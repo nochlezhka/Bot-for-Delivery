@@ -4,21 +4,18 @@ import { Portal } from '@ark-ui/react/portal';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
 
-import { NewUserCard } from '@/features/UserControl';
-import { UserRoleFilter } from '@/features/UserRoleFilter';
+import { NewPickupPointCard } from '@/features/PickupPointControl';
 import { ToastSuccess } from '@/shared/ui/Toaster';
 import { api } from '@/trpc/client';
 
-export const NewUserDialog = ({ className }: HTMLProps<HTMLDivElement>) => {
+export const NewPickupPointDialog = ({
+  className,
+}: HTMLProps<HTMLDivElement>) => {
   const dialog = useDialog();
 
-  const currentRole = UserRoleFilter.useCurrentRole();
-  const utils = api.useUtils();
-
-  const { mutate: createUser } = api.eployee.user.createUser.useMutation({
+  const { mutate } = api.eployee.pp.createOne.useMutation({
     onSuccess: async () => {
-      await utils.eployee.user.getUsers.refetch({ selected: currentRole });
-      ToastSuccess({ text: 'Пользователь создан!' });
+      ToastSuccess({ text: 'Пункт выдачи создан!' });
       dialog.setOpen(false);
     },
   });
@@ -27,17 +24,17 @@ export const NewUserDialog = ({ className }: HTMLProps<HTMLDivElement>) => {
       <Dialog.Trigger
         className={clsx(className, 'badge badge-primary gap-1 cursor-pointer')}
       >
-        Новый пользователь
+        Добавить пункт выдачи
       </Dialog.Trigger>
       <Dialog.Backdrop className="modal-backdrop fixed size-full" />
       <Portal>
         <Dialog.Positioner className="modal modal-open justify-center items-center">
           <Dialog.Content className="modal-box">
-            <NewUserCard
-              defaultValues={{ role: currentRole }}
+            <NewPickupPointCard
+              defaultValues={{ name: '' }}
               onSubmit={(data) => {
                 console.log(data);
-                createUser(data);
+                mutate(data);
               }}
             />
           </Dialog.Content>

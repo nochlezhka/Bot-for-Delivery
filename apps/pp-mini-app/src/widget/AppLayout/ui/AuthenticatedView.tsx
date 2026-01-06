@@ -5,6 +5,7 @@ import { useAtomValue } from 'jotai/react';
 import {
   BriefcaseBusiness,
   CalendarSearch,
+  Store,
   TableOfContents,
   User,
   Users,
@@ -48,6 +49,13 @@ const tabListAtom = atom((get) => {
   }
   if (isEmployee) {
     result.push({
+      link: '/employee/pp',
+      Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
+        <Store className={className} />
+      ),
+      title: 'Пункты выдачи',
+    });
+    result.push({
       link: '/employee/users',
       Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
         <Users className={className} />
@@ -66,7 +74,7 @@ const FabMenu = () => {
     [tabList, pathname]
   );
   return (
-    <div className="fab fab-flower">
+    <div className="fab">
       <div
         tabIndex={0}
         role="button"
@@ -96,7 +104,7 @@ const FabMenu = () => {
 
 export const AuthenticatedView = ({ children }: PropsWithChildren) => {
   return (
-    <div className="!grid grid-rows-1fr w-screen gap-2 overflow-hidden h-dvh">
+    <div className="grid! grid-rows-1fr w-screen gap-2 overflow-hidden h-dvh p-2">
       {children}
       <FabMenu />
     </div>
