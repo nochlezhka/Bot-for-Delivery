@@ -48,20 +48,22 @@ const tabListAtom = atom((get) => {
     );
   }
   if (isEmployee) {
-    result.push({
-      link: '/employee/pp',
-      Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
-        <Store className={className} />
-      ),
-      title: 'Пункты выдачи',
-    });
-    result.push({
-      link: '/employee/users',
-      Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
-        <Users className={className} />
-      ),
-      title: 'Пользователи',
-    });
+    result.unshift(
+      {
+        link: '/employee/pp',
+        Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
+          <Store className={className} />
+        ),
+        title: 'Пункты выдачи',
+      },
+      {
+        link: '/employee/users',
+        Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
+          <Users className={className} />
+        ),
+        title: 'Пользователи',
+      }
+    );
   }
   return result;
 });
@@ -89,15 +91,20 @@ const FabMenu = () => {
       <div role="button" className="fab-main-action btn btn-circle btn-lg">
         <X className="size-4 shrink-0" />
       </div>
-      {tabList.map((tab, i) => (
-        <NextLink
-          href={tab.link}
-          className="btn btn-lg btn-circle"
-          key={`${tab.link}-${i}`}
-        >
-          <tab.Icon className="size-4 shrink-0" />
-        </NextLink>
-      ))}
+      {tabList
+        .filter((tab) => tab.link !== currentTab?.link)
+        .map((tab, i) => (
+          <NextLink
+            onClick={(e) => {
+              e.currentTarget.blur();
+            }}
+            href={tab.link}
+            className="btn btn-lg btn-circle"
+            key={`${tab.link}-${i}`}
+          >
+            <tab.Icon className="size-4 shrink-0" />
+          </NextLink>
+        ))}
     </div>
   );
 };
