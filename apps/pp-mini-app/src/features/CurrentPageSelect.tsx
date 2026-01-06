@@ -1,5 +1,3 @@
-'use client';
-
 import { atom } from 'jotai';
 import { useAtomValue } from 'jotai/react';
 import {
@@ -11,9 +9,9 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import { usePathname } from 'next/dist/client/components/navigation';
 import NextLink from 'next/link';
-import { usePathname } from 'next/navigation';
-import { HTMLProps, PropsWithChildren, useMemo } from 'react';
+import { HTMLProps, useMemo } from 'react';
 
 import { isEmployeeAtom } from '@/entity/employee/state';
 import { roleAtom } from '@/entity/user/state';
@@ -68,7 +66,7 @@ const tabListAtom = atom((get) => {
   return result;
 });
 
-const FabMenu = () => {
+export const CurrentPageSelect = () => {
   const pathname = usePathname();
   const tabList = useAtomValue(tabListAtom);
   const currentTab = useMemo(
@@ -105,15 +103,6 @@ const FabMenu = () => {
             <tab.Icon className="size-4 shrink-0" />
           </NextLink>
         ))}
-    </div>
-  );
-};
-
-export const AuthenticatedView = ({ children }: PropsWithChildren) => {
-  return (
-    <div className="grid! grid-rows-1fr w-screen gap-2 overflow-hidden h-dvh p-2">
-      {children}
-      <FabMenu />
     </div>
   );
 };

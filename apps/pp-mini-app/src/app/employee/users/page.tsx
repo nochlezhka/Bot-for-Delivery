@@ -6,7 +6,7 @@ import { UsersListing } from '@/widget/UsersListing';
 export default function UsersPage() {
   return (
     <div className="flex flex-col relative">
-      <UserRoleFilter className=" px-2">
+      <UserRoleFilter className="px-2">
         <NewUserDialog className="col-start-2" />
       </UserRoleFilter>
       <UsersListing className="mt-2" />

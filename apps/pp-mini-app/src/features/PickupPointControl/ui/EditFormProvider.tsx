@@ -1,4 +1,5 @@
 'use client';
+import { clsx } from 'clsx';
 import { HTMLProps, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { pick } from 'remeda';
@@ -62,7 +63,10 @@ export const EditFormProvider = ({
           trigerFieldSubmit: submitAction,
         }}
       >
-        <form className={className} onSubmit={() => submitAction()}>
+        <form
+          className={clsx(className, 'pt-0')}
+          onSubmit={() => submitAction()}
+        >
           {children}
         </form>
       </PickupPointFormContext.Provider>

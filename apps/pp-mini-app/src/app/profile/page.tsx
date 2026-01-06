@@ -1,19 +1,10 @@
 'use client';
-import { useMemo } from 'react';
-
+import { ProfileLink } from '@/entity/user/ui/ProfileLink';
 import { api } from '@/trpc/client';
 
 export default function ProfilePage() {
   const { data } = api.user.profile.useQuery();
-  const username = useMemo(
-    () =>
-      data
-        ? data.tg_username
-          ? data.tg_username
-          : '@id' + data.tg_id?.toString()
-        : null,
-    [data]
-  );
+
   return (
     <div className="min-h-full w-full flex flex-col space-y-2 px-1 relative">
       {data ? (
@@ -50,12 +41,7 @@ export default function ProfilePage() {
               <span>{data.gender === 'male' ? 'Мужчина' : 'Женщина'}</span>
             </p>
             <p className="">{data.phone}</p>
-            <a
-              className="text-[var(--tg-theme-link-color)]"
-              href={`https://t.me/${username}`}
-            >
-              {username}
-            </a>
+            <ProfileLink profile={data} />
           </div>
         </div>
       ) : (

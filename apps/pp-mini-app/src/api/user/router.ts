@@ -63,6 +63,7 @@ export const userEmployeeRouter = createTRPCRouter({
         where: {
           role: input.selected,
         },
+        orderBy: { id: 'desc' },
       })
     ),
   updateUser: employeeProcedure

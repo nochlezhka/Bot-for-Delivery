@@ -1,4 +1,5 @@
 'use client';
+import { clsx } from 'clsx';
 import { pickup_point } from 'pickup-point-db/client';
 import { HTMLProps, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -25,6 +26,7 @@ export const CreateFormProvider = ({
   defaultValues,
   onSubmit,
   children,
+  className,
 }: CreateFormProviderProps) => {
   const form = useForm({
     resolver: createPickupPointResolver,
@@ -38,7 +40,9 @@ export const CreateFormProvider = ({
   return (
     <FormProvider {...form}>
       <PickupPointFormContext.Provider value={{ trigerFieldSubmit: noop }}>
-        <form onSubmit={submitAction}>{children}</form>
+        <form className={clsx(className, 'pt-0 ')} onSubmit={submitAction}>
+          {children}
+        </form>
       </PickupPointFormContext.Provider>
     </FormProvider>
   );

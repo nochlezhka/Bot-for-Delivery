@@ -25,7 +25,10 @@ export const RoleChips = ({
   return (
     <div className={clsx(className, 'flex flex-wrap gap-2 h-min')}>
       {ROLE_LIST.map((val) => (
-        <label className="badge badge-primary gap-1 cursor-pointer" key={val}>
+        <label
+          className="badge badge-lg badge-primary gap-1 cursor-pointer"
+          key={val}
+        >
           <input
             type="radio"
             value={val}

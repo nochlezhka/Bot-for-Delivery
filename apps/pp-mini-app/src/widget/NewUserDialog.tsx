@@ -2,6 +2,7 @@
 import { Dialog, useDialog } from '@ark-ui/react/dialog';
 import { Portal } from '@ark-ui/react/portal';
 import { clsx } from 'clsx';
+import { UserPlus } from 'lucide-react';
 import { HTMLProps } from 'react';
 
 import { NewUserCard } from '@/features/UserControl';
@@ -25,18 +26,20 @@ export const NewUserDialog = ({ className }: HTMLProps<HTMLDivElement>) => {
   return (
     <Dialog.RootProvider value={dialog} lazyMount unmountOnExit>
       <Dialog.Trigger
-        className={clsx(className, 'badge badge-primary gap-1 cursor-pointer')}
+        className={clsx(
+          className,
+          'btn btn-primary btn-circle gap-1 cursor-pointer'
+        )}
       >
-        Новый пользователь
+        <UserPlus className="size-4" />
       </Dialog.Trigger>
       <Dialog.Backdrop className="modal-backdrop fixed size-full" />
       <Portal>
         <Dialog.Positioner className="modal modal-open justify-center items-center">
-          <Dialog.Content className="modal-box">
+          <Dialog.Content className="modal-box  pt-3">
             <NewUserCard
               defaultValues={{ role: currentRole }}
               onSubmit={(data) => {
-                console.log(data);
                 createUser(data);
               }}
             />

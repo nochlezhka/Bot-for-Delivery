@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { compareAsc } from 'date-fns/compareAsc';
 import { format } from 'date-fns/format';
 import { ru } from 'date-fns/locale/ru';
+import { CircleAlert } from 'lucide-react';
 import { HTMLProps } from 'react';
 
 import { AcceptTimeout } from '@/entity/shift/ui/AcceptTimeout';
@@ -24,7 +25,15 @@ export const SelectedShifts = ({ className }: SelectedShiftsProps) => {
     onSuccess: () => refetch(),
   });
   return (
-    <div className={clsx(className, 'space-y-2')}>
+    <div className={clsx(className, 'space-y-2 flex flex-col')}>
+      {shiftList && shiftList.length === 0 ? (
+        <div className="inline-flex m-auto">
+          <CircleAlert />
+          <span className="ml-2">Смен нет</span>
+        </div>
+      ) : (
+        <></>
+      )}
       {(shiftList ?? []).map(([shiftId, shift]) => {
         const isHalfBusy =
           shift.status !== 'busy' &&
@@ -35,12 +44,16 @@ export const SelectedShifts = ({ className }: SelectedShiftsProps) => {
         return (
           <div
             className={clsx(
-              'card card-xs card-border shadow-sm',
-              isHalfBusy ? 'bg-red-900' : null
+              'px-2 shadow-sm card card-lg',
+              shift.accepted
+                ? 'bg-success'
+                : isAcceptAvailable(shift.dateStart)
+                ? 'bg-error'
+                : 'bg-base-100'
             )}
             key={shiftId}
           >
-            <div className="card-body">
+            <div className="card-body px-2 py-5">
               <div className="card-title">
                 {res.at(0)?.toUpperCase() + res.slice(1)}
               </div>

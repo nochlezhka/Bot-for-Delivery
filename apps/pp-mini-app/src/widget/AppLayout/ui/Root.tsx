@@ -1,7 +1,7 @@
 'use client';
 
 import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
-import { type PropsWithChildren } from 'react';
+import { createElement, type PropsWithChildren } from 'react';
 
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 import { ErrorPage } from '@/shared/ui/ErrorPage';
@@ -20,7 +20,19 @@ function RootInner({ children }: PropsWithChildren) {
   useClientOnce(() => {
     init(debug);
   });
-  return <AppView>{children}</AppView>;
+  return children;
+}
+
+function Root({ children }: PropsWithChildren) {
+  return (
+    <ErrorBoundary fallback={ErrorPage}>
+      <TRPCProvider>
+        <RootInner>
+          <AppView>{children}</AppView>
+        </RootInner>
+      </TRPCProvider>
+    </ErrorBoundary>
+  );
 }
 
 export function AppLayout(props: PropsWithChildren) {
@@ -31,11 +43,7 @@ export function AppLayout(props: PropsWithChildren) {
   useTelegramMock();
 
   return didMount ? (
-    <ErrorBoundary fallback={ErrorPage}>
-      <TRPCProvider>
-        <RootInner {...props} />
-      </TRPCProvider>
-    </ErrorBoundary>
+    createElement(Root, props)
   ) : (
     <div className="flex justify-center">
       <div className="loading loading-spinner loading-lg" />

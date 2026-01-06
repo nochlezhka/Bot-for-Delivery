@@ -27,9 +27,13 @@ export const DescriptionField = () => {
           className="textarea w-full data-placeholder-shown:text-base-content/30"
           asChild
         >
-          <textarea />
+          <textarea readOnly style={{ resize: 'none' }} />
         </Editable.Preview>
-        <Editable.Input className="textarea w-full" asChild>
+        <Editable.Input
+          className="textarea w-full"
+          asChild
+          style={{ resize: 'none' }}
+        >
           <textarea />
         </Editable.Input>
       </Editable.Root>

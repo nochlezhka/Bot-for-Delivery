@@ -33,7 +33,11 @@ export const shiftsRouter = createTRPCRouter({
 
       const foundedShift = await shiftByDates({ dateStart, dateEnd });
       if (foundedShift) {
-        if (typeof foundedShift.users[dbUser.id] === 'boolean') {
+        if (
+          typeof foundedShift.user_shifts_table.find(
+            (x) => x.user_id === dbUser.id
+          )?.status === 'boolean'
+        ) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Вы уже записаны на смену',
@@ -63,7 +67,7 @@ export const shiftsRouter = createTRPCRouter({
         let shiftId;
         if (foundedShift) {
           shiftId = foundedShift.id;
-          tx.shift.update({
+          await tx.shift.update({
             data: {
               status: foundedShift.status === 'free' ? 'halfBusy' : 'busy',
             },
@@ -106,9 +110,7 @@ export const shiftsRouter = createTRPCRouter({
     }),
 
   getOwnShifts: volunteerProcedure.query(async ({ ctx }) =>
-    getOwnShiftList({
-      userId: ctx.dbUser.id,
-    })
+    getOwnShiftList(ctx.dbUser.id)
   ),
   accept: volunteerProcedure
     .input(shiftAction)
@@ -119,12 +121,16 @@ export const shiftsRouter = createTRPCRouter({
       });
 
       if (foundedShift) {
-        if (foundedShift.users[dbUser.id] === undefined) {
+        const userShift = foundedShift.user_shifts_table.find(
+          (x) => x.user_id === dbUser.id
+        );
+
+        if (userShift === undefined) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Вы не записаны на смену',
           });
-        } else if (foundedShift.users[dbUser.id] === true) {
+        } else if (userShift.status === true) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Вы уже подтвердили смену',
@@ -160,12 +166,15 @@ export const shiftsRouter = createTRPCRouter({
       });
 
       if (foundedShift) {
-        if (foundedShift.users[dbUser.id] === undefined) {
+        const userShift = foundedShift.user_shifts_table.find(
+          (x) => x.user_id === dbUser.id
+        );
+        if (userShift === undefined) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Вы не записаны на смену',
           });
-        } else if (foundedShift.users[dbUser.id] === null) {
+        } else if (userShift.status === null) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Вы уже отменили смену',
@@ -190,6 +199,7 @@ export const shiftsRouter = createTRPCRouter({
               id,
             },
           });
+          1;
         } else if (foundedShift.status === 'busy') {
           await tx.shift.update({
             data: {
@@ -202,7 +212,7 @@ export const shiftsRouter = createTRPCRouter({
         }
         await tx.user_shifts_table.update({
           data: {
-            status: false,
+            status: null,
           },
           where: {
             user_id_shift_id: {
