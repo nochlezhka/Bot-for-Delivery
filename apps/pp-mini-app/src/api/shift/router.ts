@@ -1,5 +1,10 @@
 import { TRPCError } from '@trpc/server';
+import { addWeeks } from 'date-fns/addWeeks';
+import { endOfMonth } from 'date-fns/endOfMonth';
+import { merge, pick } from 'remeda';
+import { Frequency, RRule, rrulestr } from 'rrule';
 
+import { ExistShift, FreeShift, OwnShift } from '@/api/shift/type';
 import {
   castShiftDateTime,
   createShiftEndTimeByStart,
@@ -7,24 +12,100 @@ import {
 import { createTRPCRouter, volunteerProcedure } from '@/server/api/trpc';
 import { prisma } from '@/server/db';
 
-import {
-  getCalendarShifts,
-  getOwnShiftList,
-  shiftByDates,
-  shiftByIdAndUser,
-} from './repository';
+import { getOwnShiftList, shiftByDates, shiftByIdAndUser } from './repository';
 import { shiftAction, shiftRangeRequest, shiftSignUpRequest } from './schema';
 
 export const shiftsRouter = createTRPCRouter({
   getCalendarShifts: volunteerProcedure
     .input(shiftRangeRequest)
-    .query(async ({ ctx, input: { end, start } }) =>
-      getCalendarShifts({
-        userId: ctx.dbUser.id,
-        dateEnd: end,
-        dateStart: start,
-      })
-    ),
+    .query(async ({ ctx, input: { end, start } }) => {
+      const user = await prisma.users.findUnique({
+        where: {
+          id: ctx.dbUser.id,
+        },
+        select: {
+          pickup_point: {
+            select: {
+              schedule: true,
+            },
+          },
+        },
+      });
+
+      let schedule: RRule;
+      if (typeof user?.pickup_point?.schedule === 'string') {
+        schedule = rrulestr(user.pickup_point.schedule);
+      } else {
+        schedule = new RRule({
+          freq: Frequency.WEEKLY,
+        });
+      }
+
+      const after = start ?? new Date();
+      const before = end ?? endOfMonth(addWeeks(after, 2));
+      const plannedShifts = new Set(
+        schedule.between(after, before).map((data) => data.getTime())
+      );
+      const shifts = await prisma.shift.findMany({
+        where: {
+          date_start: {
+            lte: after,
+            gte: before,
+          },
+        },
+        include: {
+          user_shifts_table: true,
+        },
+      });
+
+      const result = new Map<
+        number,
+        Array<FreeShift | ExistShift | OwnShift>
+      >();
+
+      for (const existShift of shifts) {
+        const shiftTimestamp = existShift.date_start.getTime();
+        if (plannedShifts.has(shiftTimestamp)) {
+          plannedShifts.delete(shiftTimestamp);
+        }
+
+        let shift: ExistShift | OwnShift;
+        const userStatusMap = existShift.user_shifts_table.reduce(
+          (res, cur) => {
+            res.set(cur.user_id, cur.status);
+            return res;
+          },
+          new Map<string, boolean | null>()
+        );
+        const userStatus = userStatusMap.get(ctx.dbUser.id);
+        if (userStatus === undefined) {
+          shift = merge(pick(existShift, ['id', 'status']), {
+            dateStart: existShift.date_start,
+          }) satisfies ExistShift;
+        } else {
+          shift = merge(pick(existShift, ['id', 'status']), {
+            dateStart: existShift.date_start,
+            accepted: userStatus,
+          }) satisfies OwnShift;
+        }
+
+        result.set(
+          shiftTimestamp,
+          (result.get(shiftTimestamp) ?? []).concat(shift)
+        );
+      }
+
+      for (const plannedShitTimestamp of plannedShifts) {
+        result.set(
+          plannedShitTimestamp,
+          (result.get(plannedShitTimestamp) ?? []).concat({
+            status: 'free',
+            dateStart: new Date(plannedShitTimestamp),
+          } satisfies FreeShift)
+        );
+      }
+      return result.entries();
+    }),
   signUp: volunteerProcedure
     .input(shiftSignUpRequest)
     .use(async ({ next, input: { selectedDate }, ctx: { dbUser } }) => {
@@ -199,7 +280,6 @@ export const shiftsRouter = createTRPCRouter({
               id,
             },
           });
-          1;
         } else if (foundedShift.status === 'busy') {
           await tx.shift.update({
             data: {
