@@ -5,7 +5,7 @@ import { endOfMonth } from 'date-fns/endOfMonth';
 import { getUnixTime } from 'date-fns/getUnixTime';
 import { parseISO } from 'date-fns/parseISO';
 import { Action, Command, Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
-import { shift_status, user_role } from 'pickup-point-db/client';
+import { shift_status, user_gender, user_role } from 'pickup-point-db/client';
 import { shiftGetPayload } from 'pickup-point-db/models';
 import { rrulestr } from 'rrule';
 import { sprintf } from 'sprintf-js';
@@ -82,6 +82,7 @@ export class AppUpdate {
   @UseGuards(RoleGuard)
   @Command('select_shifts')
   async selectShiftListing(@Ctx() ctx: TelegrafContext) {
+    const user_gender = this.appCls.get<user_gender>('user.gender');
     const user_id = this.appCls.get<string>('user.id');
     const user = await this.db.users.findUnique({
       select: {
@@ -137,9 +138,11 @@ export class AppUpdate {
       scheduledShifts = user.project.projectTasks.reduce((acc, task) => {
         let result = acc;
         if (task.is_active) {
-          result = acc.concat(
-            rrulestr(task.schedule).between(curDate, lastDate)
-          );
+          if (task.gender === null || task.gender === user_gender) {
+            result = acc.concat(
+              rrulestr(task.schedule).between(curDate, lastDate)
+            );
+          }
         }
         return result;
       }, new Array<Date>());

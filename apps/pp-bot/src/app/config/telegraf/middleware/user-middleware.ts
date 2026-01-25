@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { merge, pick } from 'remeda';
 import { noop } from 'rxjs';
 import { MiddlewareFn, MiddlewareObj } from 'telegraf';
 import { BotCommandScopeChat } from 'telegraf/types';
@@ -27,11 +28,15 @@ export class UserMiddleware implements MiddlewareObj<TelegrafContext> {
         });
 
         if (user && user.tg_id) {
-          this.appCls.set('user', {
-            id: user.id,
-            role: user.role,
-            tgId: Number(user.tg_id),
-          });
+          this.appCls.set(
+            'user',
+            merge(
+              {
+                tgId: Number(user.tg_id),
+              },
+              pick(user, ['id', 'role', 'gender'])
+            )
+          );
         } else {
           this.appCls.set('user', {
             id: null,

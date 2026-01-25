@@ -1,10 +1,11 @@
-import { user_role } from 'pickup-point-db/client';
+import { user_gender, user_role } from 'pickup-point-db/client';
 import { Scenes } from 'telegraf';
 
 export type RegisteredUser = {
   id: string;
   role: user_role;
   tgId: number;
+  gender: user_gender;
 };
 
 export type UnregisteredUser = {
