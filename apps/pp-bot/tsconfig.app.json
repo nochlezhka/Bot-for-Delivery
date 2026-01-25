@@ -21,7 +21,7 @@
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
   "references": [
     {
-      "path": "../../libs/db/pickup-point/tsconfig.cjs.json"
+      "path": "../../libs/db/pickup-point"
     }
   ]
 }

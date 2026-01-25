@@ -15,7 +15,7 @@ datasource db {
   provider = "postgresql"
 }
 
-model progect {
+model project {
   id           String         @id @default(uuid(7)) @db.Uuid
   name         String         @db.VarChar(64)
   address      String?
@@ -27,10 +27,11 @@ model progect {
 model project_task {
   id         String       @id @default(uuid(7)) @db.Uuid
   name       String       @db.VarChar(64)
-  schedule   String?
+  is_active  Boolean      @default(true)
+  schedule   String
   gender     user_gender?
   project_id String       @db.Uuid
-  project    progect      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  project    project      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shifts     shift[]
 }
 
@@ -67,9 +68,9 @@ model users {
   phone             String              @db.VarChar(32)
   gender            user_gender
   role              user_role           @default(guest)
-  pickup_id         String?             @db.Uuid
+  project_id        String?             @db.Uuid
   user_shifts_table user_shifts_table[]
-  progect           progect?            @relation(fields: [pickup_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_pickup_id_pickup_point_id_fk")
+  project           project?            @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_pickup_id_pickup_point_id_fk")
 }
 
 enum shift_status {

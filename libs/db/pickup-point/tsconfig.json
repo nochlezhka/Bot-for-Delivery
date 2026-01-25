@@ -2,12 +2,8 @@
   "extends": "../../../tsconfig.base.json",
   "files": [],
   "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.cjs.json"
-    },
-    {
-      "path": "./tsconfig.esm.json"
-    }
-  ]
+  "compilerOptions": {
+    "baseUrl": ".",
+    "rootDir": "src"
+  }
 }
