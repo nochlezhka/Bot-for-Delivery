@@ -7,7 +7,7 @@ import { parseISO } from 'date-fns/parseISO';
 import { Action, Command, Ctx, Help, On, Start, Update } from 'nestjs-telegraf';
 import { shift_status, user_role } from 'pickup-point-db/client';
 import { shiftGetPayload } from 'pickup-point-db/models';
-import { RRule, rrulestr } from 'rrule';
+import { rrulestr } from 'rrule';
 import { sprintf } from 'sprintf-js';
 import { Markup } from 'telegraf';
 
@@ -37,9 +37,6 @@ const RegisterNotAllowedStatus = new Set<shift_status>([
   shift_status.weekend,
 ]);
 const SHIFT_DEFAULT_DURATION = millisecondsInHour * 2;
-const default_schedule = new RRule({
-  byweekday: ['MO', 'WE', 'FR', 'SA'],
-});
 
 @Update()
 export class AppUpdate {
@@ -85,12 +82,12 @@ export class AppUpdate {
   @UseGuards(RoleGuard)
   @Command('select_shifts')
   async selectShiftListing(@Ctx() ctx: TelegrafContext) {
-    const user_id = this.appCls.get('user.id')!;
+    const user_id = this.appCls.get<string>('user.id');
     const user = await this.db.users.findUnique({
       select: {
-        pickup_point: {
+        project: {
           select: {
-            schedule: true,
+            projectTasks: true,
           },
         },
       },
@@ -134,10 +131,19 @@ export class AppUpdate {
       >()
     );
 
-    const scheduledShifts =
-      user?.pickup_point && user?.pickup_point.schedule
-        ? rrulestr(user.pickup_point.schedule).between(curDate, lastDate)
-        : default_schedule.between(curDate, lastDate);
+    let scheduledShifts = new Array<Date>();
+
+    if (user?.project && user.project.projectTasks.length > 0) {
+      scheduledShifts = user.project.projectTasks.reduce((acc, task) => {
+        let result = acc;
+        if (task.is_active) {
+          result = acc.concat(
+            rrulestr(task.schedule).between(curDate, lastDate)
+          );
+        }
+        return result;
+      }, new Array<Date>());
+    }
 
     const keyboard = new Array<any>();
     for (const date_start of scheduledShifts) {
