@@ -20,6 +20,8 @@
     "@nestjs/schedule": "^6.0.0",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "@reatom/core": "^1000.14.1",
+    "@reatom/react": "^1000.2.2",
     "@tanstack/react-query": "^5.71.10",
     "@telegram-apps/init-data-node": "^2.0.3",
     "@telegram-apps/sdk": "^3.11.8",

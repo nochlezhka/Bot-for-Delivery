@@ -6,6 +6,7 @@ import type { PropsWithChildren } from 'react';
 import { clsx } from 'clsx';
 import localFont from 'next/font/local';
 
+import { ReatomProvider } from '@/shared/reatom';
 import { ToastContainer } from '@/shared/ui/Toaster';
 import { AppLayout } from '@/widget/AppLayout';
 
@@ -23,8 +24,10 @@ export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html className={clsx(nunito.variable, 'select-none')} lang="ru">
       <body>
-        <AppLayout>{children}</AppLayout>
-        <ToastContainer />
+        <ReatomProvider>
+          <AppLayout>{children}</AppLayout>
+          <ToastContainer />
+        </ReatomProvider>
       </body>
     </html>
   );

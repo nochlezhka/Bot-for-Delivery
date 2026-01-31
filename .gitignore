@@ -53,3 +53,5 @@ out
 
 .context/*
 !.context/.gitkeep
+
+next-env.d.ts
