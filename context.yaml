@@ -1,0 +1,58 @@
+$schema: 'https://raw.githubusercontent.com/context-hub/generator/refs/heads/main/json-schema.json'
+documents:
+  - description: Описание репозитория
+    outputPath: docs/README.md
+    sources:
+      - type: text
+        content: |
+          Монорепозиторий для разработки системы планирования волонтерских смен в пункт выдачи вещей первой необходимости
+          Содержит два приложения ориентированных на платформу telgram
+          Бот для взаимодействия с пользоателем через чат и mini-app, для взаимодействия пользователя с системой
+        tag: note
+
+  - description: Telegram mini-app, structure
+    outputPath: docs/tg-mini.app.md
+    overwrite: true
+    sources:
+      - type: tree
+        description: React в [FSD](https://feature-sliced.design/ru/llms.txt) методолигии, бот для координации волонтеров в пунктах выдачи
+        sourcePaths:
+          - apps/pp-mini-app/src
+          - apps/pp-mini-app/public
+        filePattern: '*'
+        renderFormat: ascii
+        enabled: true
+        dirContext:
+          apps/pp-mini-app/src/server: Вспомогательный серверный слой, слайсы-инстурменты (по сути сегменты) используемые сервером для реализации внутренних процедур
+          apps/pp-mini-app/src/api: 'Слой реализует логику обработки запросов клиента сервером, сегменты: trpc-router, zod-schema, db-repository'
+          apps/pp-mini-app/src/trpc: моно-слой, граница между сервером и клиентом, содержит интсурменты сервера и клиента для реализации trpc-взаимоейдствий
+          apps/pp-mini-app/src/shared: Вспомогательный FSD-слой, содержит утилиты общего назначения, ui-kit...
+          apps/pp-mini-app/src/entity: 'FSD-слой, Сущности приложения, сегменты: state, zod-schema, типизация, специфичный ui'
+          apps/pp-mini-app/src/features: FSD-слой, атомарые функции приложения, композиция entity и shared функций
+          apps/pp-mini-app/src/widget: FSD-слой, элементы ui в приложении, обусловлен дизайн-макетами figma, композиция entity, features, shared
+          apps/pp-mini-app/src/app: древовидный слой, представляет собой app-router реализацию страниц приложения, композиция всех слоев выше
+        tag: file-structure
+
+  - description: 'Telegram-bot structure'
+    outputPath: docs/tg-bot.app.md
+    overwrite: true
+    sources:
+      - type: tree
+        description: Telegram-бот на nest.js, бот для координации волонтеров в пунктах выдачи
+        sourcePaths:
+          - apps/pp-bot/src/app
+        filePattern: '*'
+        renderFormat: ascii
+        enabled: true
+
+  - description: cli-app structure
+    outputPath: docs/cli.app.md
+    overwrite: true
+    sources:
+      - type: tree
+        description: cli-интерфейс на nest.js для вспомогательных функций
+        sourcePaths:
+          - apps/pp-bot/src/cli
+        filePattern: '*'
+        renderFormat: ascii
+        enabled: true

@@ -1,0 +1,10 @@
+{
+  "context_servers": {
+    "ctx": {
+      "enabled": true,
+      "command": "ctx",
+      "args": ["server"],
+      "env": {},
+    },
+  },
+}
