@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { OctagonAlert } from 'lucide-react';
+import { HeartHandshake, OctagonAlert } from 'lucide-react';
 import { HTMLProps } from 'react';
 
 interface HalfBusyNoticeProps extends HTMLProps<HTMLDivElement> {
@@ -11,13 +11,18 @@ export const HalfBusyNotice = ({
   ownSelected,
 }: HalfBusyNoticeProps) => {
   return (
-    <div className={clsx(className, 'flex items-center')}>
-      <OctagonAlert size={16} className="storoke-red-500" />
-      <p className="ml-1">
-        {ownSelected
-          ? 'Осторожно, не полная смена!'
-          : 'Не хватает участника смены!'}
-      </p>
+    <div className={clsx(className, 'flex items-center badge badge-warning')}>
+      {ownSelected ? (
+        <>
+          <OctagonAlert size={16} className="storoke-red-500" />
+          <p className="ml-1">Осторожно, не полная смена!</p>
+        </>
+      ) : (
+        <>
+          <HeartHandshake size={16} className="storoke-red-500" />
+          <p className="ml-1">Не хватает участника смены!</p>
+        </>
+      )}
     </div>
   );
 };

@@ -1,32 +1,35 @@
 import { Inject, Logger } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
-import { schema } from 'pickup-point-db';
 import { Context } from 'telegraf';
 
-import { ConfirmSubject } from './const';
+import { ShiftConfirmSubject } from './const';
 import {
   getSubjectConfirmData,
   getSubjectConfirmPattern,
   ShiftAction,
 } from '../../commands';
-import { Drizzle } from '../../drizzle';
+import { PrismaDb } from '../../prisma';
 import { formatUserDate } from '../../util';
 
 @Update()
 export class ShiftConfirmUpdate {
-  @Inject() private readonly drizzle!: Drizzle;
+  @Inject() private readonly db!: PrismaDb;
   @Inject() readonly logger!: Logger;
 
-  @Action(getSubjectConfirmPattern(ConfirmSubject))
+  @Action(getSubjectConfirmPattern(ShiftConfirmSubject))
   async handleShiftAction(@Ctx() ctx: Context) {
     const cbq = ctx.callbackQuery;
     const dto =
       cbq && 'data' in cbq && cbq.data ? getSubjectConfirmData(cbq.data) : null;
     let user;
     if (ctx.from?.id) {
-      user = await this.drizzle.db.query.userTable.findFirst({
-        where: eq(schema.userTable.tgId, BigInt(ctx.from.id)),
+      user = await this.db.users.findUnique({
+        where: {
+          tg_id: ctx.from.id,
+        },
+        select: {
+          id: true,
+        },
       });
       if (!user) {
         this.logger.error(
@@ -40,36 +43,41 @@ export class ShiftConfirmUpdate {
       this.logger.error(`User ID not found in context when confirming shift`);
     }
     if (dto !== null && user) {
-      const { action, data: shiftId } = dto;
-      this.logger.debug(`Action: ${action}, Shift ID: ${shiftId}`);
+      const { action, data: shift_id } = dto;
+      this.logger.debug(`Action: ${action}, Shift ID: ${shift_id}`);
 
-      const shift = await this.drizzle.db.query.shiftTable.findFirst({
-        where: eq(schema.shiftTable.id, shiftId),
+      const shift = await this.db.shift.findUnique({
+        where: {
+          id: shift_id,
+        },
+        select: {
+          date_start: true,
+        },
       });
 
       if (shift) {
-        await this.drizzle.db
-          .update(schema.userShiftsTable)
-          .set({ status: action === ShiftAction.Confirm })
-          .where(
-            and(
-              eq(schema.userShiftsTable.userId, user.id),
-              eq(schema.userShiftsTable.shiftId, shiftId)
-            )
-          );
+        await this.db.user_shifts_table.update({
+          data: { status: action === ShiftAction.Confirm },
+          where: {
+            user_id_shift_id: {
+              shift_id,
+              user_id: user.id,
+            },
+          },
+        });
 
         switch (action) {
           case ShiftAction.Confirm:
             await ctx.reply(
               `✅ Смена ${formatUserDate(
-                shift.dateStart
+                shift.date_start
               )} подтверждена. Спасибо за вашу помощь!`
             );
             break;
           case ShiftAction.Decline:
             await ctx.reply(
               `❌ Смена ${formatUserDate(
-                shift.dateStart
+                shift.date_start
               )} отклонена. Спасибо за уведомление! Мы сообщим координаторам.`
             );
             break;
@@ -79,7 +87,9 @@ export class ShiftConfirmUpdate {
         await ctx.editMessageReplyMarkup(undefined);
         await ctx.answerCbQuery('✅ Действие выполнено');
       } else {
-        this.logger.error(`Shift with ID ${shiftId} not found in shifts table`);
+        this.logger.error(
+          `Shift with ID ${shift_id} not found in shifts table`
+        );
         await ctx.reply('❌ Смена не найдена. Пожалуйста, попробуйте позже.');
       }
     }

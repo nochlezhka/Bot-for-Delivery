@@ -1,6 +1,5 @@
+import { user_role } from 'pickup-point-db/client';
 import { BotCommand } from 'typegram';
-
-import type { UserRoles } from 'pickup-point-db';
 
 const guestCommands: Array<BotCommand> = [
   { command: 'start', description: 'Начать' },
@@ -9,12 +8,13 @@ const guestCommands: Array<BotCommand> = [
 
 const volunteerCommands: Array<BotCommand> = [
   { command: 'start', description: 'Начать' },
-  { command: 'shifts', description: 'Выбрать смены' },
+  { command: 'select_shifts', description: 'Выбрать смены' },
   { command: 'help', description: 'Помощь' },
 ];
 
 const coordinatorCommands: Array<BotCommand> = [
   { command: 'start', description: 'Начать' },
+  { command: 'select_shifts', description: 'Выбрать смены' },
   { command: 'approve', description: 'Одобрить волонтёра' },
   { command: 'stats', description: 'Статистика' },
   { command: 'help', description: 'Помощь' },
@@ -22,12 +22,13 @@ const coordinatorCommands: Array<BotCommand> = [
 
 const employeeCommands: Array<BotCommand> = [
   { command: 'start', description: 'Начать' },
+  { command: 'select_shifts', description: 'Выбрать смены' },
   { command: 'approve', description: 'Одобрить волонтёра' },
   { command: 'stats', description: 'Статистика' },
   { command: 'help', description: 'Помощь' },
 ];
 
-export const USER_COMMANDS: Record<UserRoles, Array<BotCommand>> = {
+export const USER_COMMANDS: Record<user_role, Array<BotCommand>> = {
   guest: guestCommands,
   volunteer: volunteerCommands,
   coordinator: coordinatorCommands,

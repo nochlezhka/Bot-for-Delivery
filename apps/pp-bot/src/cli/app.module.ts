@@ -1,12 +1,12 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { DrizzleModule } from '../app/drizzle';
 import { SetupHolidaysCliCommand } from './commands/setup-holidays.cli-command';
+import { PrismaModule } from '../app/prisma';
 
 @Module({
-  imports: [ConfigModule.forRoot(), HttpModule, DrizzleModule],
-  providers: [SetupHolidaysCliCommand],
+  imports: [ConfigModule.forRoot(), HttpModule, PrismaModule],
+  providers: [SetupHolidaysCliCommand, Logger],
 })
 export class AppModule {}

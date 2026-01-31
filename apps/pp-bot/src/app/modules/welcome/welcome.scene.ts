@@ -1,21 +1,20 @@
 import { Inject } from '@nestjs/common';
 import { On, Scene, SceneEnter, SceneLeave } from 'nestjs-telegraf';
-import { schema } from 'pickup-point-db';
 import { CallbackQuery, Message } from 'typegram';
 
 import {
+  REMOVE_KEYBOARD,
   REQUEST_CONTACT_KEYBOARD,
   REQUEST_GENDER_KEYBOARD,
-  REMOVE_KEYBOARD,
   WELCOME_SCENE_ID,
 } from './constant';
 import { ExpectedState, ResultState } from './type';
-import { Drizzle } from '../../drizzle';
+import { PrismaDb } from '../../prisma';
 import { type TelegrafContext } from '../../type';
 
 @Scene(WELCOME_SCENE_ID)
 export class WelcomeScene {
-  @Inject() private readonly drizzle!: Drizzle;
+  @Inject() private readonly db!: PrismaDb;
 
   @SceneEnter()
   async onSceneEnter(ctx: TelegrafContext) {
@@ -29,19 +28,23 @@ export class WelcomeScene {
   async onSceneLeave(ctx: TelegrafContext) {
     const {
       gender,
-      contact: { user_id, phone_number, last_name, first_name },
+      contact: { user_id: tg_id, phone_number, last_name, first_name },
     } = ctx.scene.session.state as ResultState;
-    const tgUsername = ctx.from?.username;
-    if (user_id) {
-      await this.drizzle.db.insert(schema.userTable).values({
-        tgUsername,
-        gender,
-        name: [last_name, first_name].join(' '),
-        phone: phone_number,
-        tgId: BigInt(user_id),
+    const tg_username = ctx.from?.username;
+    if (tg_id) {
+      await this.db.users.create({
+        data: {
+          tg_username,
+          gender,
+          name: [last_name, first_name].join(' '),
+          phone: phone_number,
+          tg_id,
+        },
       });
     }
-    await ctx.reply('Вы зарегистрированы! Пожалуйста, ожидайте подтверждения статуса волонтера.');
+    await ctx.reply(
+      'Вы зарегистрированы! Пожалуйста, ожидайте подтверждения статуса волонтера.'
+    );
   }
 
   @On('contact')

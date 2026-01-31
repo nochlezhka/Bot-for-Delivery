@@ -10,19 +10,21 @@ import { type InitData, parse, validate } from '@telegram-apps/init-data-node';
 import { initTRPC, TRPCError } from '@trpc/server';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { connectionFactory, schema } from 'pickup-point-db';
+import { users } from 'pickup-point-db/browser';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
 
-import { db } from '@/server/db';
+import { prisma } from '@/server/db';
+
+import type { PrismaClient } from 'pickup-point-db/client';
 
 import console from 'node:console';
 import process from 'node:process';
 
 export interface ContextData {
   user: null | InitData;
-  dbUser: typeof schema.userTable.$inferSelect | null;
-  db: ReturnType<typeof connectionFactory>;
+  dbUser: users | null;
+  db: PrismaClient;
 }
 
 /**
@@ -54,11 +56,13 @@ export const createTRPCContext = async ({
           validate(authData, process.env['TELEGRAM_BOT_TOKEN'] ?? '');
         }
         user = parse(authData);
-        const userId = user.user?.id;
-        if (typeof userId === 'number') {
+        const tg_id = user.user?.id;
+        if (typeof tg_id === 'number') {
           dbUser =
-            (await db.query.userTable.findFirst({
-              where: ({ tgId }, { eq }) => eq(tgId, BigInt(userId)),
+            (await prisma.users.findUnique({
+              where: {
+                tg_id,
+              },
             })) ?? null;
         }
       } catch (e) {
@@ -68,7 +72,7 @@ export const createTRPCContext = async ({
     default:
       console.error('Unauthorized');
   }
-  return { user, db, dbUser };
+  return { user, db: prisma, dbUser };
 };
 
 /**
@@ -136,40 +140,37 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
-export const publicProcedure = t.procedure.use(timingMiddleware).use<
-  Omit<ContextData, 'dbUser'> & {
-    dbUser: typeof schema.userTable.$inferSelect;
-  }
->(({ ctx, next }) => {
-  if (!ctx.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
-  }
-  return next({ ctx });
-});
+type Context = Omit<ContextData, 'dbUser'> & {
+  dbUser: users;
+};
+export const publicProcedure = t.procedure
+  .use(timingMiddleware)
+  .use<Context>(({ ctx, next }) => {
+    if (!ctx.user) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    return next({ ctx });
+  });
 
-export const employeeProcedure = t.procedure.use(timingMiddleware).use<
-  Omit<ContextData, 'dbUser'> & {
-    dbUser: typeof schema.userTable.$inferSelect;
-  }
->(({ ctx, next }) => {
-  if (!ctx.dbUser || ctx.dbUser.role !== 'employee') {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
-  }
-  return next({ ctx });
-});
+export const employeeProcedure = t.procedure
+  .use(timingMiddleware)
+  .use<Context>(({ ctx, next }) => {
+    if (!ctx.dbUser || ctx.dbUser.role !== 'employee') {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    return next({ ctx });
+  });
 
 const volunteerAccessibleRoles = new Set([
   'volunteer',
   'employee',
   'coordinator',
 ]);
-export const volunteerProcedure = t.procedure.use(timingMiddleware).use<
-  Omit<ContextData, 'dbUser'> & {
-    dbUser: typeof schema.userTable.$inferSelect;
-  }
->(({ ctx, next }) => {
-  if (!ctx.dbUser || !volunteerAccessibleRoles.has(ctx.dbUser.role)) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' });
-  }
-  return next({ ctx });
-});
+export const volunteerProcedure = t.procedure
+  .use(timingMiddleware)
+  .use<Context>(({ ctx, next }) => {
+    if (!ctx.dbUser || !volunteerAccessibleRoles.has(ctx.dbUser.role)) {
+      throw new TRPCError({ code: 'UNAUTHORIZED' });
+    }
+    return next({ ctx });
+  });

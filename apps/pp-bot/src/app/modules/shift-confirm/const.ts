@@ -1,1 +1,1 @@
-export const ConfirmSubject = 'shift';
+export const ShiftConfirmSubject = 'shift';

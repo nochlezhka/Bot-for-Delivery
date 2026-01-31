@@ -1,16 +1,15 @@
 'use client';
+import { Noop } from '@util/types';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
 
-import { Noop } from '@/shared/types';
-
-import type { UserRoles } from 'pickup-point-db';
+import type { user_role } from 'pickup-point-db/browser';
 
 import { ROLE_LIST, ROLE_NAMES } from '../constant';
 
 interface RoleChipsProps extends Omit<HTMLProps<HTMLDivElement>, 'onChange'> {
-  defaultSelected: UserRoles;
-  onChange?: (role: UserRoles) => ReturnType<Noop>;
+  defaultSelected: user_role;
+  onChange?: (role: user_role) => ReturnType<Noop>;
 }
 
 export const RoleChips = ({
@@ -18,7 +17,7 @@ export const RoleChips = ({
   onChange,
   className,
 }: RoleChipsProps) => {
-  const selectAciton = (val: UserRoles) => {
+  const selectAciton = (val: user_role) => {
     if (onChange) {
       onChange(val);
     }
@@ -26,7 +25,10 @@ export const RoleChips = ({
   return (
     <div className={clsx(className, 'flex flex-wrap gap-2 h-min')}>
       {ROLE_LIST.map((val) => (
-        <label className="badge badge-primary gap-1 cursor-pointer" key={val}>
+        <label
+          className="badge badge-lg badge-primary gap-1 cursor-pointer"
+          key={val}
+        >
           <input
             type="radio"
             value={val}

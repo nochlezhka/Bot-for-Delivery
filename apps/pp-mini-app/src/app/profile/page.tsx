@@ -1,19 +1,10 @@
 'use client';
-import { useMemo } from 'react';
-
+import { ProfileLink } from '@/entity/user/ui/ProfileLink';
 import { api } from '@/trpc/client';
 
 export default function ProfilePage() {
   const { data } = api.user.profile.useQuery();
-  const username = useMemo(
-    () =>
-      data
-        ? data.tgUsername
-          ? data.tgUsername
-          : '@id' + data.tgId.toString()
-        : null,
-    [data]
-  );
+
   return (
     <div className="min-h-full w-full flex flex-col space-y-2 px-1 relative">
       {data ? (
@@ -25,16 +16,32 @@ export default function ProfilePage() {
           </div>
           <div className="ml-2 flex flex-col space-y-2">
             <p className="text-xl font-bold">{data.name}</p>
-            <p className="text-[var(--tg-theme-subtitle-text-color)]">
-              {data.gender === 'male' ? 'Мужчина' : 'Женщина'}
+            <p className="text-secondary-content lowercase flex flex-wrap gap-2">
+              <span>
+                {(() => {
+                  let result = 'Неизвестная роль';
+                  switch (data.role) {
+                    case 'guest':
+                      result = 'Гость';
+                      break;
+                    case 'volunteer':
+                      result = 'Волонтер';
+                      break;
+                    case 'coordinator':
+                      result = 'Координатор';
+                      break;
+                    case 'employee':
+                      result = 'Сотрудник';
+                      break;
+                  }
+
+                  return result;
+                })()}
+              </span>
+              <span>{data.gender === 'male' ? 'Мужчина' : 'Женщина'}</span>
             </p>
             <p className="">{data.phone}</p>
-            <a
-              className="text-[var(--tg-theme-link-color)]"
-              href={`https://t.me/${username}`}
-            >
-              {username}
-            </a>
+            <ProfileLink profile={data} />
           </div>
         </div>
       ) : (

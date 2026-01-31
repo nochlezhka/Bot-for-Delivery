@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX "uniqueDate" ON "shift" USING btree ("date_start","date_end");

@@ -1,71 +1,96 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import { Interval } from '@nestjs/schedule';
-import { and, eq } from 'drizzle-orm';
-import { schema } from 'pickup-point-db';
+import { sprintf } from 'sprintf-js';
 
-import { ConfirmSubject } from './const';
-import { RemindShiftsQuery } from './remind-shifts.query';
+import { ShiftConfirmSubject } from './const';
 import { SendConfirmCommand } from '../../commands';
-import { Drizzle } from '../../drizzle';
+import { PrismaDb } from '../../prisma';
 import { formatUserDate } from '../../util';
 
 @Injectable()
 export class ReminderService {
   @Inject() private readonly logger!: Logger;
-  @Inject() private readonly drizzle!: Drizzle;
+  @Inject() private readonly db!: PrismaDb;
   @Inject() private readonly commandBus!: CommandBus;
-  @Inject() private readonly queryBus!: QueryBus;
 
   @Interval(60000)
   async handleEventReminders() {
     this.logger.debug('Extracting upcoming shifts within the next 24 hours');
-    const shifts = await this.queryBus.execute(new RemindShiftsQuery());
-    this.logger.debug(`Extracted ${shifts.length} upcoming shifts`);
+    const now = new Date();
+    const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const result = new Array<{ user_id: string; shift_id: string }>();
+    const userShifts = await this.db.user_shifts_table.findMany({
+      where: {
+        shift: {
+          date_start: {
+            gt: now,
+            lt: in24h,
+          },
+        },
+      },
+      select: {
+        user_id: true,
+        shift_id: true,
+        shift: {
+          select: {
+            title: true,
+            date_start: true,
+          },
+        },
+        users: {
+          select: {
+            tg_id: true,
+          },
+        },
+      },
+    });
+    this.logger.debug(
+      `Extracted ${userShifts.length} upcoming shift reminders`
+    );
 
-    for (const shift of shifts) {
-      if (!shift.userShifts || shift.userShifts.length === 0) {
-        this.logger.debug(
-          `No non-reminded users found for shift ${shift.title} with start date ${shift.dateStart}`
-        );
-        continue;
-      }
-      for (const userShift of shift.userShifts) {
-        if (userShift.user) {
-          try {
-            await this.commandBus.execute(
-              new SendConfirmCommand(
-                userShift.user.tgId.toString(),
-                `Напоминаю вам о смене ${
-                  shift.title
-                }, начинающейся в ${formatUserDate(
-                  shift.dateStart
-                )}, на которую вы записаны`,
-                ConfirmSubject,
-                shift.id
-              )
-            );
-            await this.drizzle.db
-              .update(schema.userShiftsTable)
-              .set({ confirmationRequestSent: true })
-              .where(
-                and(
-                  eq(schema.userShiftsTable.userId, userShift.userId),
-                  eq(schema.userShiftsTable.shiftId, userShift.shiftId)
-                )
-              );
-            this.logger.debug(
-              `Sent reminder to ${userShift.user.tgId.toString()}`
-            );
-          } catch (err) {
-            if (err instanceof Error) {
-              this.logger.error(`Failed to send reminder: ${err.message}`);
-            } else {
-              this.logger.error('Failed to send reminder:', err);
-            }
-          }
+    for (const {
+      shift_id,
+      user_id,
+      shift: { title, date_start },
+      users: { tg_id },
+    } of userShifts) {
+      try {
+        if (tg_id) {
+          await this.commandBus.execute(
+            new SendConfirmCommand(
+              tg_id.toString(),
+              sprintf(
+                'Напоминаю вам о смене %s, на которую вы записаны %s',
+                title,
+                formatUserDate(date_start)
+              ),
+              ShiftConfirmSubject,
+              shift_id
+            )
+          );
+          this.logger.debug(`Sent reminder to ${user_id}`);
+        } else {
+          this.logger.debug(`Skip reminder to ${user_id}`);
+        }
+        result.push({ user_id, shift_id });
+      } catch (err) {
+        if (err instanceof Error) {
+          this.logger.error(`Failed to send reminder: ${err.message}`);
+        } else {
+          this.logger.error('Failed to send reminder:', err);
         }
       }
+    }
+    if (result.length > 0) {
+      await this.db.user_shifts_table.updateMany({
+        where: {
+          OR: result,
+        },
+        data: {
+          confirmation_request_sent: true,
+        },
+      });
     }
   }
 }

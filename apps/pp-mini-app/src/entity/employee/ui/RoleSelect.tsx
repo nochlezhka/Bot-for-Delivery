@@ -1,38 +1,38 @@
+import { createListCollection } from '@ark-ui/react/collection';
+import { Noop } from '@util/types';
+import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
 
 import { ROLE_LIST, ROLE_NAMES } from '@/entity/employee/constant';
-import { Noop } from '@/shared/types';
+import { SelectMenu } from '@/shared/ui/SelectMenu';
 
-import type { UserRoles } from 'pickup-point-db';
+import type { user_role } from 'pickup-point-db/browser';
 
 interface RoleSelectProps extends Omit<HTMLProps<HTMLDivElement>, 'onChange'> {
   isLoading?: boolean;
-  defaultSelected: UserRoles;
-  onChange?: (role: UserRoles) => ReturnType<Noop>;
+  disabled?: boolean;
+  defaultSelected?: user_role;
+  onChange?: (role: user_role) => ReturnType<Noop>;
 }
+const collection = createListCollection<user_role>({
+  items: ROLE_LIST,
+  itemToString: (item: user_role) => ROLE_NAMES[item],
+});
 
 export const RoleSelect = ({
   isLoading,
+  disabled,
   defaultSelected,
   onChange,
-}: RoleSelectProps) => {
-  return (
-    <fieldset className="fieldset w-full">
-      <legend className="fieldset-legend">Роль</legend>
-      <select
-        className="select select-sm"
-        disabled={isLoading}
-        value={defaultSelected}
-        onChange={(event) =>
-          onChange && onChange(event.currentTarget.value as UserRoles)
-        }
-      >
-        {ROLE_LIST.map((role) => (
-          <option key={role} value={role}>
-            {ROLE_NAMES[role]}
-          </option>
-        ))}
-      </select>
-    </fieldset>
-  );
-};
+  className,
+}: RoleSelectProps) => (
+  <SelectMenu
+    portaled
+    collection={collection}
+    value={defaultSelected}
+    onChange={(value) => onChange?.(value as user_role)}
+    isLoading={isLoading}
+    disabled={disabled}
+    className={clsx(className, 'flex')}
+  />
+);

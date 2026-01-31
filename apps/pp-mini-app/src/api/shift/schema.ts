@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const shiftRangeRequest = z.object({
+  taskId: z.string().uuid(),
   start: z.date().optional(),
   end: z.date().optional(),
 });

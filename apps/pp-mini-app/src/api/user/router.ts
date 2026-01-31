@@ -1,5 +1,4 @@
-import { eq } from 'drizzle-orm/expressions';
-import { schema } from 'pickup-point-db';
+import { user_role } from 'pickup-point-db/client';
 import { z } from 'zod';
 
 import {
@@ -8,7 +7,11 @@ import {
   publicProcedure,
 } from '@/server/api/trpc';
 
-import { registerRequestSchema } from './schema';
+import {
+  createRequestSchema,
+  registerRequestSchema,
+  updateRequestSchema,
+} from './schema';
 
 export const userRouter = createTRPCRouter({
   profile: publicProcedure.query(async ({ ctx }) => {
@@ -16,8 +19,10 @@ export const userRouter = createTRPCRouter({
 
     if (ctx.user && ctx.user.user) {
       result =
-        (await ctx.db.query.userTable.findFirst({
-          where: eq(schema.userTable.tgId, BigInt(ctx.user.user.id)),
+        (await ctx.db.users.findUnique({
+          where: {
+            tg_id: ctx.user.user.id,
+          },
         })) ?? null;
     }
 
@@ -28,42 +33,54 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const user = ctx.user?.user;
       if (user) {
-        await ctx.db.insert(schema.userTable).values({
-          tgUsername: user.username,
-          gender: input.gender,
-          name: [user.last_name, user.first_name].join(' '),
-          phone: input.phone,
-          tgId: BigInt(user.id),
+        ctx.db.users.create({
+          data: {
+            tg_username: user.username,
+            gender: input.gender,
+            name: [user.last_name, user.first_name].join(' '),
+            phone: input.phone,
+            tg_id: user.id,
+          },
         });
       }
     }),
 });
 
-export const eployeeRouter = createTRPCRouter({
+export const userEmployeeRouter = createTRPCRouter({
   getUsers: employeeProcedure
     .input(
       z.object({
-        selected: z.enum(schema.userRoleEnum.enumValues),
+        selected: z.enum([
+          user_role.employee,
+          user_role.coordinator,
+          user_role.guest,
+          user_role.volunteer,
+        ]),
       })
     )
     .query(async ({ ctx, input }) =>
-      ctx.db.query.userTable.findMany({
-        where: ({ role }, { eq }) => eq(role, input.selected),
+      ctx.db.users.findMany({
+        where: {
+          role: input.selected,
+        },
+        orderBy: { id: 'desc' },
       })
     ),
-  changeUserRole: employeeProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        role: z.enum(schema.userRoleEnum.enumValues),
-      })
-    )
+  updateUser: employeeProcedure
+    .input(updateRequestSchema)
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
-        .update(schema.userTable)
-        .set({
-          role: input.role,
-        })
-        .where(eq(schema.userTable.id, input.id));
+      if (Object.keys(input).length !== 0) {
+        await ctx.db.users.update({
+          data: input,
+          where: {
+            id: input.id,
+          },
+        });
+      }
+    }),
+  createUser: employeeProcedure
+    .input(createRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.users.create({ data: input });
     }),
 });

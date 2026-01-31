@@ -2,71 +2,47 @@
   "name": "pickup-point-db",
   "version": "0.0.1",
   "private": true,
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "development": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+    "./client": {
+      "types": "./esm/client.ts",
+      "import": "./esm/client.ts",
+      "require": "./cjs/client.ts"
+    },
+    "./browser": {
+      "types": "./esm/browser.ts",
+      "import": "./esm/browser.ts",
+      "require": "./cjs/browser.ts"
+    },
+    "./models": {
+      "types": "./esm/models.ts"
     }
   },
+  "files": [
+    "prisma"
+  ],
   "nx": {
+    "buildable": false,
     "sourceRoot": "libs/db/pickup-point/src",
     "targets": {
-      "build": {
-        "executor": "@nx/js:swc",
-        "outputs": [
-          "{options.outputPath}"
-        ],
-        "options": {
-          "outputPath": "libs/db/pickup-point/dist",
-          "main": "libs/db/pickup-point/src/index.ts",
-          "tsConfig": "libs/db/pickup-point/tsconfig.lib.json",
-          "skipTypeCheck": true,
-          "stripLeadingPaths": true
-        }
-      },
-      "push": {
+      "prisma:pull": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "drizzle-kit push",
+          "command": "prisma db pull --schema=./prisma/schema.prisma",
           "cwd": "libs/db/pickup-point"
         }
       },
-      "generate": {
+      "prisma:push": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "drizzle-kit generate",
+          "command": "prisma db push --schema=./prisma/schema.prisma",
           "cwd": "libs/db/pickup-point"
         }
       },
-      "migrate": {
+      "prisma:generate": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "drizzle-kit migrate",
+          "command": "prisma generate --schema=./prisma/schema.prisma",
           "cwd": "libs/db/pickup-point"
-        }
-      },
-      "ci": {
-        "dependsOn": [
-          "build"
-        ],
-        "executor": "@nx-tools/nx-container:build",
-        "options": {
-          "push": true,
-          "metadata": {
-            "images": [
-              "ghcr.io/nochlezhka/Bot-for-Delivery/pickup-point-db"
-            ],
-            "tags": [
-              "type=ref,event=branch"
-            ]
-          },
-          "platforms": ["linux/amd64", "linux/arm64"]
         }
       }
     }

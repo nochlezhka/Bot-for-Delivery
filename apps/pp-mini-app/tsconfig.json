@@ -31,6 +31,7 @@
     "../../apps/pp-mini-app/.next/types/**/*.ts",
     "../../dist/apps/pp-mini-app/.next/types/**/*.ts",
     "next-env.d.ts",
+    "index.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [
@@ -46,6 +47,9 @@
     "eslint.config.mjs"
   ],
   "references": [
+    {
+      "path": "../../libs/util/types"
+    },
     {
       "path": "../../libs/db/pickup-point"
     }

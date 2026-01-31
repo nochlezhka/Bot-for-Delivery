@@ -1,5 +1,6 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "neverConnectToCloud": true,
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
@@ -16,7 +17,8 @@
         "typecheck": {
           "targetName": "typecheck"
         }
-      }
+      },
+      "exclude": ["libs/util/types/*"]
     },
     {
       "plugin": "@nx/next/plugin",
@@ -50,6 +52,19 @@
       "options": {
         "defaultEngine": "docker",
         "defaultRegistry": "docker.io"
+      }
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": ["libs/util/types/*"],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json"
+        }
       }
     }
   ],

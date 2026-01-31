@@ -11,6 +11,9 @@
     },
     {
       "path": "./apps/pp-bot"
+    },
+    {
+      "path": "./libs/util/types"
     }
   ]
 }

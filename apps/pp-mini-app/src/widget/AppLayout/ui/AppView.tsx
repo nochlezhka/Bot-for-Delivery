@@ -2,10 +2,9 @@
 
 import { PropsWithChildren } from 'react';
 
-import { RegisterForm } from '@/features/RegisterForm';
+import { CurrentPageSelect } from '@/features/CurrentPageSelect';
+import { GuestRegister } from '@/features/GuestRegister';
 import { api } from '@/trpc/client';
-
-import { AuthenticatedView } from './AuthenticatedView';
 
 export const AppView = ({ children }: PropsWithChildren) => {
   const {
@@ -31,14 +30,16 @@ export const AppView = ({ children }: PropsWithChildren) => {
           </div>
         );
       } else {
-        result = <AuthenticatedView>{children}</AuthenticatedView>;
+        result = (
+          <div className="grid! grid-rows-1fr w-screen gap-2 overflow-hidden h-dvh pt-2 pb-5">
+            {children}
+            <CurrentPageSelect />
+          </div>
+        );
       }
     } else if (profile === null) {
       result = (
-        <RegisterForm
-          className="flex-grow"
-          onSuccess={completeRegisterAction}
-        />
+        <GuestRegister className="grow" onSuccess={completeRegisterAction} />
       );
     }
   }
