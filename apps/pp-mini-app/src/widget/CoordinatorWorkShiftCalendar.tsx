@@ -15,20 +15,27 @@ export function CoordinatorWorkShiftCalendar() {
   const [selectedShift, setSelectedShift] = useState<VolunteerShift | null>(
     null
   );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedShifts, setSelectedShifts] = useState<VolunteerShift[] | null>(
+    null
+  );
+
   return (
     <>
       <VolunteerShiftDateSelect
         ref={calendarRef}
-        onChangeValue={(value) => setSelectedShift(value)}
-        onDateReset={() => setSelectedShift(null)}
+        onChangeValue={(value) => setSelectedDate(value)}
+        onDateReset={() => {}}
       />
       <Dialog.Root
+        skipAnimationOnMount
         open={selectedShift !== null}
         modal
         lazyMount
         unmountOnExit
         onOpenChange={({ open }) => {
           if (!open) {
+            setSelectedShift(null);
             calendarRef.current?.resetCalendar();
           }
         }}

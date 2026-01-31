@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { addWeeks } from 'date-fns/addWeeks';
 import { endOfMonth } from 'date-fns/endOfMonth';
 import { merge, pick } from 'remeda';
-import { Frequency, RRule, rrulestr } from 'rrule';
+import { RRule, rrulestr } from 'rrule';
 
 import { ExistShift, FreeShift, OwnShift } from '@/api/shift/type';
 import {
@@ -15,37 +15,30 @@ import { prisma } from '@/server/db';
 import { getOwnShiftList, shiftByDates, shiftByIdAndUser } from './repository';
 import { shiftAction, shiftRangeRequest, shiftSignUpRequest } from './schema';
 
-export const shiftsRouter = createTRPCRouter({
-  getCalendarShifts: volunteerProcedure
+const shiftsRouter = createTRPCRouter({
+  getTaskShifts: volunteerProcedure
     .input(shiftRangeRequest)
-    .query(async ({ ctx, input: { end, start } }) => {
-      const user = await prisma.users.findUnique({
+    .query(async ({ ctx, input: { taskId, end, start } }) => {
+      const task = await prisma.project_task.findUniqueOrThrow({
         where: {
-          id: ctx.dbUser.id,
-        },
-        select: {
-          pickup_point: {
-            select: {
-              schedule: true,
-            },
-          },
+          id: taskId,
         },
       });
 
-      let schedule: RRule;
-      if (typeof user?.pickup_point?.schedule === 'string') {
-        schedule = rrulestr(user.pickup_point.schedule);
-      } else {
-        schedule = new RRule({
-          freq: Frequency.WEEKLY,
-        });
+      let schedule: RRule | null = null;
+      if (task.is_active) {
+        if (task.gender === null || task.gender === ctx.dbUser.gender) {
+          schedule = rrulestr(task.schedule);
+        }
       }
 
       const after = start ?? new Date();
       const before = end ?? endOfMonth(addWeeks(after, 2));
-      const plannedShifts = new Set(
-        schedule.between(after, before).map((data) => data.getTime())
-      );
+      const plannedShifts = new Set<number>();
+      for (const scheduledShift of schedule?.between(after, before) ?? []) {
+        plannedShifts.add(scheduledShift.getTime());
+      }
+
       const shifts = await prisma.shift.findMany({
         where: {
           date_start: {
@@ -104,7 +97,7 @@ export const shiftsRouter = createTRPCRouter({
           } satisfies FreeShift)
         );
       }
-      return result.entries();
+      return Array.from(result.entries());
     }),
   signUp: volunteerProcedure
     .input(shiftSignUpRequest)
@@ -304,3 +297,4 @@ export const shiftsRouter = createTRPCRouter({
       });
     }),
 });
+export default shiftsRouter;

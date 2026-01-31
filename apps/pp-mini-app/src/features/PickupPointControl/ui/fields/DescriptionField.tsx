@@ -3,12 +3,12 @@ import { Editable } from '@ark-ui/react/editable';
 import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 
-import type { pickup_point } from 'pickup-point-db/browser';
+import type { project } from 'pickup-point-db/browser';
 
 import { PickupPointFormContext } from '../../Context';
 
 export const DescriptionField = () => {
-  const { control } = useFormContext<pickup_point>();
+  const { control } = useFormContext<project>();
   const { field, fieldState } = useController({ name: 'description', control });
 
   const { trigerFieldSubmit } = useContext(PickupPointFormContext);

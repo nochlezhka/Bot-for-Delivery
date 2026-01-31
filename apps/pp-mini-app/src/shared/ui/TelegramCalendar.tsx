@@ -9,14 +9,12 @@ import { useMemo } from 'react';
 
 interface TelegramCalendarProps {
   datepicker: UseDatePickerReturn;
-  highlightedDays?: Set<number>;
-  isWarrning?: (timestamp: number) => boolean;
+  daycolors?: Record<string, string>;
 }
 
 export const TelegramCalendar = ({
   datepicker,
-  highlightedDays,
-  isWarrning,
+  daycolors,
 }: TelegramCalendarProps) => {
   return (
     <DatePicker.RootProvider value={datepicker} className="w-full m-auto pb-5">
@@ -55,21 +53,14 @@ export const TelegramCalendar = ({
                 >
                   {week.map((day, id) => {
                     const isDisabled = datepicker.isUnavailable(day);
-                    const _isWarrning = Boolean(
-                      !isDisabled &&
-                        isWarrning &&
-                        isWarrning(startOfDay(day.toDate(CURRENT_TZ)).getTime())
-                    );
-                    const _isHightlited = Boolean(
-                      highlightedDays?.has(
-                        startOfDay(day.toDate(CURRENT_TZ)).getTime()
-                      )
-                    );
+                    const dayColor =
+                      daycolors?.[startOfDay(day.toDate(CURRENT_TZ)).getTime()];
                     return (
                       <DatePicker.TableCell
                         key={id}
                         value={day}
                         className="flex aspect-square"
+                        style={{ ['--day-color']: dayColor }}
                       >
                         <button
                           disabled={isDisabled}
@@ -77,13 +68,8 @@ export const TelegramCalendar = ({
                             datepicker.setValue([day as CalendarDate]);
                           }}
                           className={clsx(
-                            'btn btn-wide !h-full px-[6px] py-0.5 flex justify-end items-end text-xl overflow-hidden',
-                            isDisabled ? 'btn-dash' : null,
-                            _isWarrning
-                              ? _isHightlited
-                                ? 'btn-error'
-                                : 'btn-warning'
-                              : null
+                            'btn btn-wide !h-full px-[6px] py-0.5 flex justify-end items-end text-xl overflow-hidden bg-[var(--day-color)]',
+                            isDisabled ? 'btn-dash' : null
                           )}
                         >
                           {day.day.toString()}

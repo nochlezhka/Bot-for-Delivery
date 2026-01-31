@@ -34,27 +34,28 @@ export const EditFormProvider = ({
     resolver: updateUserResolver,
   });
 
-  const submitAction: (v?: keyof Omit<users, 'pickup_id'>) => ReturnType<Noop> =
-    useMemo(
-      () => (key) => {
-        form.handleSubmit(
-          (data) => {
-            let result = data;
-            if (key) {
-              result = pick(data, [key, 'id']);
-            }
-            onSubmit?.(result);
-          },
-          () => {
-            if (autoresetOnError) {
-              //TODO: доработь авторесет
-              form.reset(defaultValues, { keepErrors: true });
-            }
+  const submitAction: (
+    v?: keyof Omit<users, 'project_id'>
+  ) => ReturnType<Noop> = useMemo(
+    () => (key) => {
+      form.handleSubmit(
+        (data) => {
+          let result = data;
+          if (key) {
+            result = pick(data, [key, 'id']);
           }
-        )();
-      },
-      [autoresetOnError, defaultValues, form, onSubmit]
-    );
+          onSubmit?.(result);
+        },
+        () => {
+          if (autoresetOnError) {
+            //TODO: доработь авторесет
+            form.reset(defaultValues, { keepErrors: true });
+          }
+        }
+      )();
+    },
+    [autoresetOnError, defaultValues, form, onSubmit]
+  );
 
   return (
     <FormProvider {...form}>

@@ -1,6 +1,6 @@
 'use client';
 import { clsx } from 'clsx';
-import { pickup_point } from 'pickup-point-db/client';
+import { project } from 'pickup-point-db/client';
 import { HTMLProps, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { noop } from 'rxjs';
@@ -13,7 +13,7 @@ import type { Noop } from '@util/types';
 
 import { PickupPointFormContext } from '../Context';
 
-type formData = pickup_point;
+type formData = project;
 type formResult = z.infer<typeof createRequestSchema>;
 
 export interface CreateFormProviderProps

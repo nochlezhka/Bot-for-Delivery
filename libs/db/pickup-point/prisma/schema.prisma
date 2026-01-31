@@ -32,7 +32,6 @@ model project_task {
   gender     user_gender?
   project_id String       @db.Uuid
   project    project      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  shifts     shift[]
 }
 
 model shift {
@@ -42,9 +41,6 @@ model shift {
   title             String              @db.VarChar(64)
   status            shift_status        @default(free)
   user_shifts_table user_shifts_table[]
-
-  task_id String?       @db.Uuid
-  task    project_task? @relation(fields: [task_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
   @@unique([date_start, date_end], map: "uniqueDate")
 }

@@ -1,6 +1,6 @@
 import { pickupPointEmployeeRouter } from '@/api/pickup-point/router';
 import { rpcRouter } from '@/api/rpc/router';
-import { shiftsRouter } from '@/api/shift/router';
+import shiftsRouter from '@/api/shift/router';
 import { userEmployeeRouter, userRouter } from '@/api/user/router';
 
 import { createCallerFactory, createTRPCRouter } from './trpc';

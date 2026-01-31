@@ -1,14 +1,12 @@
 'use client';
-import { ChangeEvent, useContext, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 import { entries, merge } from 'remeda';
 import { ALL_WEEKDAYS, RRule, Weekday } from 'rrule';
 import { Frequency } from 'rrule/dist/esm/types';
 import { WeekdayStr } from 'rrule/dist/esm/weekday';
 
-import type { pickup_point } from 'pickup-point-db/browser';
-
-import { PickupPointFormContext } from '../../Context';
+import type { project_task } from 'pickup-point-db/browser';
 
 type SchedulerVal = Record<WeekdayStr, boolean>;
 const defaultSchedule: SchedulerVal = {
@@ -62,7 +60,7 @@ const stringToSchedule = (rruleString: string) => {
 };
 
 export const ScheduleField = () => {
-  const { control } = useFormContext<pickup_point>();
+  const { control } = useFormContext<project_task>();
   const { field, fieldState } = useController({
     name: 'schedule',
     control,
@@ -72,14 +70,12 @@ export const ScheduleField = () => {
     field.value ? stringToSchedule(field.value) : defaultSchedule
   );
 
-  const { trigerFieldSubmit } = useContext(PickupPointFormContext);
   const scheduledDayToggleAction = (e: ChangeEvent<HTMLInputElement>) => {
     const res = merge(weekdayActivity, {
       [e.currentTarget.value]: e.currentTarget.checked,
     } as SchedulerVal);
     setWeekdayActivity(res);
     field.onChange(scheduleToString(res));
-    trigerFieldSubmit('schedule');
   };
   return (
     <fieldset className="fieldset">

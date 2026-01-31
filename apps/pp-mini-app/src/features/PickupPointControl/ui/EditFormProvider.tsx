@@ -9,11 +9,11 @@ import { updateRequestSchema } from '@/api/pickup-point/schema';
 import { updatePickupPointResolver } from '@/entity/pickup-point/resolver';
 
 import type { Noop } from '@util/types';
-import type { pickup_point } from 'pickup-point-db/browser';
+import type { project } from 'pickup-point-db/browser';
 
 import { PickupPointFormContext } from '../Context';
 
-type formData = pickup_point;
+type formData = project;
 type formResult = z.infer<typeof updateRequestSchema>;
 
 export interface EditFormProviderProps
