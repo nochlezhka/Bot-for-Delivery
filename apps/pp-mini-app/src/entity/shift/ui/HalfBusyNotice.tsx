@@ -14,12 +14,12 @@ export const HalfBusyNotice = ({
     <div className={clsx(className, 'flex items-center badge badge-warning')}>
       {ownSelected ? (
         <>
-          <OctagonAlert size={16} className="storoke-red-500" />
+          <OctagonAlert className="storoke-red-500" size={16} />
           <p className="ml-1">Осторожно, не полная смена!</p>
         </>
       ) : (
         <>
-          <HeartHandshake size={16} className="storoke-red-500" />
+          <HeartHandshake className="storoke-red-500" size={16} />
           <p className="ml-1">Не хватает участника смены!</p>
         </>
       )}

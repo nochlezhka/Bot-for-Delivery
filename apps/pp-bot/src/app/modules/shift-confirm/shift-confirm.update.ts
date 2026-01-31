@@ -2,7 +2,6 @@ import { Inject, Logger } from '@nestjs/common';
 import { Action, Ctx, Update } from 'nestjs-telegraf';
 import { Context } from 'telegraf';
 
-import { ShiftConfirmSubject } from './const';
 import {
   getSubjectConfirmData,
   getSubjectConfirmPattern,
@@ -10,11 +9,12 @@ import {
 } from '../../commands';
 import { PrismaDb } from '../../prisma';
 import { formatUserDate } from '../../util';
+import { ShiftConfirmSubject } from './const';
 
 @Update()
 export class ShiftConfirmUpdate {
-  @Inject() private readonly db!: PrismaDb;
   @Inject() readonly logger!: Logger;
+  @Inject() private readonly db!: PrismaDb;
 
   @Action(getSubjectConfirmPattern(ShiftConfirmSubject))
   async handleShiftAction(@Ctx() ctx: Context) {
@@ -24,11 +24,11 @@ export class ShiftConfirmUpdate {
     let user;
     if (ctx.from?.id) {
       user = await this.db.users.findUnique({
-        where: {
-          tg_id: ctx.from.id,
-        },
         select: {
           id: true,
+        },
+        where: {
+          tg_id: ctx.from.id,
         },
       });
       if (!user) {
@@ -47,11 +47,11 @@ export class ShiftConfirmUpdate {
       this.logger.debug(`Action: ${action}, Shift ID: ${shift_id}`);
 
       const shift = await this.db.shift.findUnique({
-        where: {
-          id: shift_id,
-        },
         select: {
           date_start: true,
+        },
+        where: {
+          id: shift_id,
         },
       });
 

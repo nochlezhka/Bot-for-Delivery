@@ -9,16 +9,16 @@ const current = atom<user_role>(user_role.volunteer);
 
 type UsersPageFiltersProps = HTMLProps<HTMLDivElement>;
 export const UserRoleFilter = ({
-  className,
   children,
+  className,
 }: UsersPageFiltersProps) => {
   const [pageRole, setCurrentRole] = useAtom(current);
   return (
     <div className={clsx(className, 'grid grid-cols-[1fr_auto] gap-2')}>
       <RoleChips
+        className="col-start-1"
         defaultSelected={pageRole}
         onChange={setCurrentRole}
-        className="col-start-1"
       />
       {children}
     </div>

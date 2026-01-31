@@ -1,15 +1,15 @@
 'use client';
+import type { project } from 'pickup-point-db/browser';
+
 import { Editable } from '@ark-ui/react/editable';
 import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
-
-import type { project } from 'pickup-point-db/browser';
 
 import { PickupPointFormContext } from '../../Context';
 
 export const DescriptionField = () => {
   const { control } = useFormContext<project>();
-  const { field, fieldState } = useController({ name: 'description', control });
+  const { field, fieldState } = useController({ control, name: 'description' });
 
   const { trigerFieldSubmit } = useContext(PickupPointFormContext);
 
@@ -17,21 +17,21 @@ export const DescriptionField = () => {
     <fieldset className="fieldset">
       <legend className="fieldset-legend">Описание</legend>
       <Editable.Root
-        placeholder="Введите имя"
-        defaultValue={field.value ?? ''}
         className="form-control"
-        onValueCommit={trigerFieldSubmit.bind(null, 'description')}
+        defaultValue={field.value ?? ''}
         onValueChange={({ value }) => field.onChange(value)}
+        onValueCommit={trigerFieldSubmit.bind(null, 'description')}
+        placeholder="Введите имя"
       >
         <Editable.Preview
-          className="textarea w-full data-placeholder-shown:text-base-content/30"
           asChild
+          className="textarea w-full data-placeholder-shown:text-base-content/30"
         >
           <textarea readOnly style={{ resize: 'none' }} />
         </Editable.Preview>
         <Editable.Input
-          className="textarea w-full"
           asChild
+          className="textarea w-full"
           style={{ resize: 'none' }}
         >
           <textarea />

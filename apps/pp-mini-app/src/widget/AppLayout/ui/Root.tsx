@@ -7,33 +7,11 @@ import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 import { ErrorPage } from '@/shared/ui/ErrorPage';
 import { TRPCProvider } from '@/trpc/client';
 
-import { AppView } from './AppView';
 import { useClientOnce } from '../hooks/useClientOnce';
 import { useDidMount } from '../hooks/useDidMount';
 import { useTelegramMock } from '../hooks/useTelegramMock';
 import { init } from '../init';
-
-function RootInner({ children }: PropsWithChildren) {
-  const lp = retrieveLaunchParams();
-  const isDev = process.env.NEXT_PUBLIC_MOCK_ENV === '1';
-  const debug = isDev || lp.startParam === 'debug';
-  useClientOnce(() => {
-    init(debug);
-  });
-  return children;
-}
-
-function Root({ children }: PropsWithChildren) {
-  return (
-    <ErrorBoundary fallback={ErrorPage}>
-      <TRPCProvider>
-        <RootInner>
-          <AppView>{children}</AppView>
-        </RootInner>
-      </TRPCProvider>
-    </ErrorBoundary>
-  );
-}
+import { AppView } from './AppView';
 
 export function AppLayout(props: PropsWithChildren) {
   // Unfortunately, Telegram Mini Apps does not allow us to use all features of
@@ -49,4 +27,26 @@ export function AppLayout(props: PropsWithChildren) {
       <div className="loading loading-spinner loading-lg" />
     </div>
   );
+}
+
+function Root({ children }: PropsWithChildren) {
+  return (
+    <ErrorBoundary fallback={ErrorPage}>
+      <TRPCProvider>
+        <RootInner>
+          <AppView>{children}</AppView>
+        </RootInner>
+      </TRPCProvider>
+    </ErrorBoundary>
+  );
+}
+
+function RootInner({ children }: PropsWithChildren) {
+  const lp = retrieveLaunchParams();
+  const isDev = process.env.NEXT_PUBLIC_MOCK_ENV === '1';
+  const debug = isDev || lp.startParam === 'debug';
+  useClientOnce(() => {
+    init(debug);
+  });
+  return children;
 }

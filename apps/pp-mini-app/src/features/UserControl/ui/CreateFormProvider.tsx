@@ -1,4 +1,7 @@
 'use client';
+import type { Noop } from '@util/types';
+import type { users } from 'pickup-point-db/browser';
+
 import { HTMLProps, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { merge } from 'remeda';
@@ -8,31 +11,28 @@ import z from 'zod';
 import { createRequestSchema } from '@/api/user/schema';
 import { createUserResolver } from '@/entity/user/resolver';
 
-import type { Noop } from '@util/types';
-import type { users } from 'pickup-point-db/browser';
-
 import { UserFormContext } from '../Context';
-
-type formData = users;
-type formResult = z.infer<typeof createRequestSchema>;
 
 export interface CreateFormProviderProps
   extends Omit<HTMLProps<HTMLDivElement>, 'onSubmit'> {
-  onSubmit?: (data: formResult) => ReturnType<Noop>;
   defaultValues?: Partial<formData>;
+  onSubmit?: (data: formResult) => ReturnType<Noop>;
 }
+type formData = users;
+
+type formResult = z.infer<typeof createRequestSchema>;
 
 export const CreateFormProvider = ({
+  children,
   defaultValues,
   onSubmit,
-  children,
 }: CreateFormProviderProps) => {
   const form = useForm({
-    resolver: createUserResolver,
     defaultValues: merge(
       { tgId: null, tgUsername: null },
       defaultValues as formResult
     ),
+    resolver: createUserResolver,
   });
   const submitAction = useMemo(
     () => form.handleSubmit((data) => onSubmit?.(data)),

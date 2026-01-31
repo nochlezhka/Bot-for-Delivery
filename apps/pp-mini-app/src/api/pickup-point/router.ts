@@ -3,6 +3,13 @@ import { createTRPCRouter, employeeProcedure } from '@/server/api/trpc';
 import { createRequestSchema, updateRequestSchema } from './schema';
 
 export const pickupPointEmployeeRouter = createTRPCRouter({
+  createOne: employeeProcedure
+    .input(createRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.project.create({
+        data: input,
+      });
+    }),
   getList: employeeProcedure.query(async ({ ctx }) =>
     ctx.db.project.findMany({ orderBy: { id: 'desc' } })
   ),
@@ -17,12 +24,5 @@ export const pickupPointEmployeeRouter = createTRPCRouter({
           },
         });
       }
-    }),
-  createOne: employeeProcedure
-    .input(createRequestSchema)
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.project.create({
-        data: input,
-      });
     }),
 });

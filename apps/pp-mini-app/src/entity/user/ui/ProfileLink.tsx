@@ -12,7 +12,7 @@ export const ProfileLink = ({ className, profile }: ProfileLinkProps) => {
     profile.phone.replaceAll('-', '').replaceAll(/\s*/g, '')
   }`;
   return (
-    <a href={`https://t.me/${link}`} className={clsx(className, 'link')}>
+    <a className={clsx(className, 'link')} href={`https://t.me/${link}`}>
       @{link}
     </a>
   );

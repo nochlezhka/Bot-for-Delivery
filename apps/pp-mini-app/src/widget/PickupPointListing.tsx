@@ -41,8 +41,8 @@ export const PickupPointListing = ({ className }: UsersListingProps) => {
             <UpdatePickupPointCard
               autoresetOnError
               className="bg-base-100 p-2"
-              key={pickuppoint.id}
               defaultValues={pickuppoint}
+              key={pickuppoint.id}
               onSubmit={(data) =>
                 updatePickuppoint(merge(data, pick(pickuppoint, ['id'])))
               }

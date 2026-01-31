@@ -1,13 +1,13 @@
+import type { ThemeParams } from '@telegram-apps/types';
+
 import { emitEvent, mockTelegramEnv } from '@telegram-apps/sdk-react';
 import { useEffect } from 'react';
 
-import type { ThemeParams } from '@telegram-apps/types';
-
 const noInsets = {
-  left: 0,
-  top: 0,
   bottom: 0,
+  left: 0,
   right: 0,
+  top: 0,
 } as const;
 const themeParams: ThemeParams = {
   accent_text_color: '#6ab2f2',
@@ -26,7 +26,7 @@ const themeParams: ThemeParams = {
 } as const;
 
 const auth_date = Math.floor(Date.now() / 1000).toString();
-const user = JSON.stringify({ id: 1, first_name: 'Pavel' });
+const user = JSON.stringify({ first_name: 'Pavel', id: 1 });
 
 /**
  * Mocks Telegram environment in development mode.
@@ -41,16 +41,16 @@ export function useTelegramMock(): void {
         const signature = 'knnfIxk_sHa7ngM8BuNaYtN7_mUnZpUNI0';
         mockTelegramEnv({
           launchParams: {
-            tgWebAppThemeParams: themeParams,
             tgWebAppData: new URLSearchParams([
               ['user', user],
               ['hash', hash],
               ['signature', signature],
               ['auth_date', auth_date],
             ]),
-            tgWebAppStartParam: 'debug',
-            tgWebAppVersion: '8',
             tgWebAppPlatform: 'tdesktop',
+            tgWebAppStartParam: 'debug',
+            tgWebAppThemeParams: themeParams,
+            tgWebAppVersion: '8',
           },
           onEvent(e) {
             if (e[0] === 'web_app_request_theme') {
@@ -59,9 +59,9 @@ export function useTelegramMock(): void {
             if (e[0] === 'web_app_request_viewport') {
               return emitEvent('viewport_changed', {
                 height: window.innerHeight,
-                width: window.innerWidth,
                 is_expanded: true,
                 is_state_stable: true,
+                width: window.innerWidth,
               });
             }
             if (e[0] === 'web_app_request_content_safe_area') {

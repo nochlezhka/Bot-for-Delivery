@@ -7,8 +7,8 @@ export const ROLE_LIST: Array<user_role> = [
   'guest',
 ];
 export const ROLE_NAMES: Record<user_role, string> = {
-  employee: 'Сотрудник',
-  volunteer: 'Волонтер',
   coordinator: 'Координатор',
+  employee: 'Сотрудник',
   guest: 'Гость',
+  volunteer: 'Волонтер',
 };

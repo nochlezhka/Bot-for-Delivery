@@ -17,7 +17,7 @@ export const TelegramCalendar = ({
   daycolors,
 }: TelegramCalendarProps) => {
   return (
-    <DatePicker.RootProvider value={datepicker} className="w-full m-auto pb-5">
+    <DatePicker.RootProvider className="w-full m-auto pb-5" value={datepicker}>
       <DatePicker.Content className="flex flex-col">
         <div className="flex flex-col">
           <div className="grid grid-cols-[auto_1fr_auto] justify-items-center items-center">
@@ -48,8 +48,8 @@ export const TelegramCalendar = ({
             <DatePicker.TableBody className="flex gap-1 flex-col grow mt-5">
               {datepicker.weeks.map((week, id) => (
                 <DatePicker.TableRow
-                  key={id}
                   className="grid grid-cols-7 gap-1 w-full grow"
+                  key={id}
                 >
                   {week.map((day, id) => {
                     const isDisabled = datepicker.isUnavailable(day);
@@ -57,20 +57,20 @@ export const TelegramCalendar = ({
                       daycolors?.[startOfDay(day.toDate(CURRENT_TZ)).getTime()];
                     return (
                       <DatePicker.TableCell
-                        key={id}
-                        value={day}
                         className="flex aspect-square"
+                        key={id}
                         style={{ ['--day-color']: dayColor }}
+                        value={day}
                       >
                         <button
-                          disabled={isDisabled}
-                          onClick={() => {
-                            datepicker.setValue([day as CalendarDate]);
-                          }}
                           className={clsx(
                             'btn btn-wide !h-full px-[6px] py-0.5 flex justify-end items-end text-xl overflow-hidden bg-[var(--day-color)]',
                             isDisabled ? 'btn-dash' : null
                           )}
+                          disabled={isDisabled}
+                          onClick={() => {
+                            datepicker.setValue([day as CalendarDate]);
+                          }}
                         >
                           {day.day.toString()}
                         </button>
@@ -90,24 +90,19 @@ export const TelegramCalendar = ({
 export const CURRENT_TZ = 'Europe/Moscow';
 
 interface UseTelegramCalendarProps {
-  onChangeValue: (date: Date) => ReturnType<Noop>;
-  onDateReset: Noop;
   isDateUnavailable?: (date: Date) => boolean;
   maxDate?: Date;
+  onChangeValue: (date: Date) => ReturnType<Noop>;
+  onDateReset: Noop;
 }
 
 TelegramCalendar.useDatepicker = ({
   isDateUnavailable,
-  onDateReset,
-  onChangeValue,
   maxDate,
+  onChangeValue,
+  onDateReset,
 }: UseTelegramCalendarProps) => {
   const datePicker = useDatePicker({
-    open: true,
-    selectionMode: 'single',
-    locale: 'ru',
-    min: now(CURRENT_TZ),
-    max: maxDate ? fromDate(maxDate, CURRENT_TZ) : undefined,
     isDateUnavailable: (date) => {
       let result = true;
       const isOutOfRange =
@@ -118,6 +113,9 @@ TelegramCalendar.useDatepicker = ({
       }
       return result;
     },
+    locale: 'ru',
+    max: maxDate ? fromDate(maxDate, CURRENT_TZ) : undefined,
+    min: now(CURRENT_TZ),
     onValueChange: async ({ value }: ValueChangeDetails) => {
       const selectedDate = value[0];
       if (selectedDate) {
@@ -126,6 +124,8 @@ TelegramCalendar.useDatepicker = ({
         await onDateReset();
       }
     },
+    open: true,
+    selectionMode: 'single',
   });
 
   const dateRange = useMemo(
@@ -137,6 +137,8 @@ TelegramCalendar.useDatepicker = ({
   );
 
   return {
+    datePicker,
+    dateRange,
     resetCalendar: () => {
       const currentDate = datePicker.value[0];
       if (currentDate) {
@@ -144,7 +146,5 @@ TelegramCalendar.useDatepicker = ({
         datePicker.focusMonth(currentDate.month);
       }
     },
-    dateRange,
-    datePicker,
   };
 };

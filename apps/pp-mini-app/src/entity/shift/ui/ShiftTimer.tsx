@@ -7,11 +7,11 @@ interface ShiftTimerProps extends HTMLProps<HTMLDivElement> {
 
 export const ShiftTimer = ({ className, startMs }: ShiftTimerProps) => (
   <Timer.Root
+    autoStart
     className={className}
+    countdown
     startMs={startMs}
     targetMs={0}
-    autoStart
-    countdown
   >
     <Timer.Area className="grid gap-2 grid-flow-col auto-cols-[min-content]">
       <div className="flex items-end gap-0.5">

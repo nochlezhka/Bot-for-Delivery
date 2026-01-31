@@ -16,8 +16,8 @@ export class PrismaDb extends PrismaClient {
 
 @Global()
 @Module({
+  exports: [PrismaDb],
   imports: [ConfigModule],
   providers: [PrismaDb],
-  exports: [PrismaDb],
 })
 export class PrismaModule {}

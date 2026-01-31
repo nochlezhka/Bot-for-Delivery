@@ -29,9 +29,9 @@ const employeeCommands: Array<BotCommand> = [
 ];
 
 export const USER_COMMANDS: Record<user_role, Array<BotCommand>> = {
-  guest: guestCommands,
-  volunteer: volunteerCommands,
   coordinator: coordinatorCommands,
   employee: employeeCommands,
+  guest: guestCommands,
+  volunteer: volunteerCommands,
 };
 export const DEFAULT_COMMANDS = guestCommands;

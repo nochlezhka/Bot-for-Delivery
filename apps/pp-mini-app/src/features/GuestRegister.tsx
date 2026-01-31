@@ -16,11 +16,11 @@ interface RegisterFormProps extends HTMLProps<HTMLFormElement> {
 
 const resolver = zodResolver(registerRequestSchema);
 
-export const GuestRegister = ({ onSuccess, className }: RegisterFormProps) => {
-  const { mutateAsync, isPending } = api.user.register.useMutation({
+export const GuestRegister = ({ className, onSuccess }: RegisterFormProps) => {
+  const { isPending, mutateAsync } = api.user.register.useMutation({
     onSuccess,
   });
-  const { handleSubmit, control } = useForm({ resolver });
+  const { control, handleSubmit } = useForm({ resolver });
   const submitAction = handleSubmit(async (data) => {
     try {
       await mutateAsync(data);
@@ -32,11 +32,11 @@ export const GuestRegister = ({ onSuccess, className }: RegisterFormProps) => {
 
   return (
     <form
-      onSubmit={submitAction}
       className={clsx(
         className,
         'flex flex-col justify-center overflow-hidden'
       )}
+      onSubmit={submitAction}
     >
       <div className="flex flex-col justify-center relative px-5">
         <div className="flex flex-col items-center absolute bottom-[calc(100%+5vh)] left-1/2 -translate-x-1/2">
@@ -54,6 +54,7 @@ export const GuestRegister = ({ onSuccess, className }: RegisterFormProps) => {
         </div>
         <Controller
           control={control}
+          name="phone"
           render={({ field, fieldState }) => (
             <fieldset className="fieldset w-full">
               <legend className="fieldset-legend">Телефон для связи</legend>
@@ -62,36 +63,36 @@ export const GuestRegister = ({ onSuccess, className }: RegisterFormProps) => {
                   'input input-lg w-full',
                   fieldState.error ? 'input-error' : undefined
                 )}
-                ref={inputRef}
-                placeholder="Введите номер телефона"
                 onChange={(e) => field.onChange(e.target.value)}
+                placeholder="Введите номер телефона"
+                ref={inputRef}
               />
               {fieldState.error?.message ? (
                 <span>{fieldState.error?.message}</span>
               ) : null}
             </fieldset>
           )}
-          name="phone"
         />
         <Controller
           control={control}
+          name="gender"
           render={({ field, fieldState }) => (
             <div className="flex gap-x-2 gap-y-1 mt-5">
               <label className="badge badge-xl badge-primary gap-1 ">
                 <input
-                  type="radio"
-                  onChange={() => field.onChange('male')}
-                  value="male"
                   name="gender"
+                  onChange={() => field.onChange('male')}
+                  type="radio"
+                  value="male"
                 />
                 Мужской
               </label>
               <label className="badge badge-xl badge-primary gap-1">
                 <input
-                  type="radio"
-                  onChange={() => field.onChange('female')}
-                  value="female"
                   name="gender"
+                  onChange={() => field.onChange('female')}
+                  type="radio"
+                  value="female"
                 />
                 Женский
               </label>
@@ -100,14 +101,13 @@ export const GuestRegister = ({ onSuccess, className }: RegisterFormProps) => {
               ) : null}
             </div>
           )}
-          name="gender"
         />
         <button
-          type="submit"
           className={clsx(
             isPending ? 'btn-disabled' : null,
             'btn btn-primary fixed bottom-[10px] w-[calc(100%-40px)] !left-1/2 !-translate-x-1/2'
           )}
+          type="submit"
         >
           {isPending ? <span className="loading loading-spinner"></span> : null}
           Зарегистрироваться

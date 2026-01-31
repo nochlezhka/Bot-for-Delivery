@@ -12,26 +12,26 @@ import {
 
 export function VolunteerWorkShiftCalendar() {
   const calendarRef = useRef<VolunteerCalendarRef>(null);
-  const [selectedShift, setSelectedShift] = useState<VolunteerShift | null>(
+  const [selectedShift, setSelectedShift] = useState<null | VolunteerShift>(
     null
   );
   return (
     <>
       <VolunteerShiftDateSelect
-        ref={calendarRef}
         onChangeValue={(value) => setSelectedShift(value)}
         onDateReset={() => setSelectedShift(null)}
+        ref={calendarRef}
       />
       <Dialog.Root
-        open={selectedShift !== null}
-        modal
         lazyMount
-        unmountOnExit
+        modal
         onOpenChange={({ open }) => {
           if (!open) {
             calendarRef.current?.resetCalendar();
           }
         }}
+        open={selectedShift !== null}
+        unmountOnExit
       >
         <Portal>
           <Dialog.Positioner className="absolute z-10 flex justify-center items-center">
@@ -40,10 +40,10 @@ export function VolunteerWorkShiftCalendar() {
                 <></>
               ) : (
                 <VolunteerShiftControl
-                  shift={selectedShift}
                   onActionComplete={() =>
                     calendarRef.current?.resetAndRefresh()
                   }
+                  shift={selectedShift}
                 />
               )}
             </Dialog.Content>

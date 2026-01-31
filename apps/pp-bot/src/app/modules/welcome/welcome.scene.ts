@@ -2,6 +2,8 @@ import { Inject } from '@nestjs/common';
 import { On, Scene, SceneEnter, SceneLeave } from 'nestjs-telegraf';
 import { CallbackQuery, Message } from 'typegram';
 
+import { PrismaDb } from '../../prisma';
+import { type TelegrafContext } from '../../type';
 import {
   REMOVE_KEYBOARD,
   REQUEST_CONTACT_KEYBOARD,
@@ -9,42 +11,18 @@ import {
   WELCOME_SCENE_ID,
 } from './constant';
 import { ExpectedState, ResultState } from './type';
-import { PrismaDb } from '../../prisma';
-import { type TelegrafContext } from '../../type';
 
 @Scene(WELCOME_SCENE_ID)
 export class WelcomeScene {
   @Inject() private readonly db!: PrismaDb;
 
-  @SceneEnter()
-  async onSceneEnter(ctx: TelegrafContext) {
-    await ctx.reply(
-      'Для регистрации необходимо указать ваш номер',
-      REQUEST_CONTACT_KEYBOARD
-    );
-  }
-
-  @SceneLeave()
-  async onSceneLeave(ctx: TelegrafContext) {
-    const {
-      gender,
-      contact: { user_id: tg_id, phone_number, last_name, first_name },
-    } = ctx.scene.session.state as ResultState;
-    const tg_username = ctx.from?.username;
-    if (tg_id) {
-      await this.db.users.create({
-        data: {
-          tg_username,
-          gender,
-          name: [last_name, first_name].join(' '),
-          phone: phone_number,
-          tg_id,
-        },
-      });
-    }
-    await ctx.reply(
-      'Вы зарегистрированы! Пожалуйста, ожидайте подтверждения статуса волонтера.'
-    );
+  @On('callback_query')
+  async callbackQuery(ctx: TelegrafContext) {
+    ctx.scene.session.state = {
+      ...(ctx.scene.session.state ?? {}),
+      gender: (ctx.callbackQuery as CallbackQuery.DataQuery).data,
+    };
+    await ctx.scene.leave();
   }
 
   @On('contact')
@@ -57,13 +35,35 @@ export class WelcomeScene {
     await ctx.reply('Теперь необходимо указать пол', REQUEST_GENDER_KEYBOARD);
   }
 
-  @On('callback_query')
-  async callbackQuery(ctx: TelegrafContext) {
-    ctx.scene.session.state = {
-      ...(ctx.scene.session.state ?? {}),
-      gender: (ctx.callbackQuery as CallbackQuery.DataQuery).data,
-    };
-    await ctx.scene.leave();
+  @SceneEnter()
+  async onSceneEnter(ctx: TelegrafContext) {
+    await ctx.reply(
+      'Для регистрации необходимо указать ваш номер',
+      REQUEST_CONTACT_KEYBOARD
+    );
+  }
+
+  @SceneLeave()
+  async onSceneLeave(ctx: TelegrafContext) {
+    const {
+      contact: { first_name, last_name, phone_number, user_id: tg_id },
+      gender,
+    } = ctx.scene.session.state as ResultState;
+    const tg_username = ctx.from?.username;
+    if (tg_id) {
+      await this.db.users.create({
+        data: {
+          gender,
+          name: [last_name, first_name].join(' '),
+          phone: phone_number,
+          tg_id,
+          tg_username,
+        },
+      });
+    }
+    await ctx.reply(
+      'Вы зарегистрированы! Пожалуйста, ожидайте подтверждения статуса волонтера.'
+    );
   }
 
   @On('text')

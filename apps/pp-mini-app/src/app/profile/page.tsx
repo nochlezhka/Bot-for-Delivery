@@ -21,17 +21,17 @@ export default function ProfilePage() {
                 {(() => {
                   let result = 'Неизвестная роль';
                   switch (data.role) {
-                    case 'guest':
-                      result = 'Гость';
-                      break;
-                    case 'volunteer':
-                      result = 'Волонтер';
-                      break;
                     case 'coordinator':
                       result = 'Координатор';
                       break;
                     case 'employee':
                       result = 'Сотрудник';
+                      break;
+                    case 'guest':
+                      result = 'Гость';
+                      break;
+                    case 'volunteer':
+                      result = 'Волонтер';
                       break;
                   }
 

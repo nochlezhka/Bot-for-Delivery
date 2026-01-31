@@ -10,7 +10,7 @@ import { UserFormContext } from '../../Context';
 
 export const GenderField = () => {
   const { control } = useFormContext<users>();
-  const { field, fieldState } = useController({ name: 'gender', control });
+  const { field, fieldState } = useController({ control, name: 'gender' });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);
   return (
@@ -27,9 +27,9 @@ export const GenderField = () => {
         >
           {GENDER_VALUES.map((gender) => (
             <RadioGroup.Item
+              className="flex items-center"
               key={gender}
               value={gender}
-              className="flex items-center"
             >
               <RadioGroup.ItemText>{GENDER_NAMES[gender]}</RadioGroup.ItemText>
               <RadioGroup.ItemHiddenInput className="radio! ml-1!" />

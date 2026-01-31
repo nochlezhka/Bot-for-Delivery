@@ -7,39 +7,39 @@ import { shiftKeyByDate } from '@/entity/shift/util';
 import { prisma } from '@/server/db';
 
 export const getCalendarShifts = async ({
-  dateStart,
   dateEnd,
+  dateStart,
   userId,
 }: {
-  dateStart?: Date;
   dateEnd?: Date;
+  dateStart?: Date;
   userId: string;
 }) => {
   const currentDate = new Date();
   const data = await prisma.shift.findMany({
     select: {
+      date_start: true,
       id: true,
       status: true,
-      date_start: true,
       user_shifts_table: true,
     },
     where: {
-      date_start: {
-        gte: dateStart ?? startOfMonth(currentDate),
-      },
       date_end: {
         lt: dateEnd ?? endOfMonth(currentDate),
+      },
+      date_start: {
+        gte: dateStart ?? startOfMonth(currentDate),
       },
     },
   });
   return Array.from(
     data
       .reduce(
-        (acc, { id, status, date_start: dateStart, user_shifts_table }) => {
+        (acc, { date_start: dateStart, id, status, user_shifts_table }) => {
           const key = shiftKeyByDate(dateStart);
           const shift = acc.get(key) ?? {
-            id,
             dateStart,
+            id,
             status,
           };
           for (const userShift of user_shifts_table) {
@@ -55,10 +55,10 @@ export const getCalendarShifts = async ({
         new Map<
           number,
           {
+            accepted?: boolean | null;
+            dateStart: Date;
             id: string;
             status: shift_status;
-            dateStart: Date;
-            accepted?: boolean | null;
           }
         >()
       )
@@ -69,10 +69,13 @@ export const getCalendarShifts = async ({
 export const getOwnShiftList = async (userId: string) => {
   const currentDate = new Date();
   const data = await prisma.shift.findMany({
+    orderBy: {
+      date_start: 'asc',
+    },
     select: {
+      date_start: true,
       id: true,
       status: true,
-      date_start: true,
       user_shifts_table: true,
     },
     where: {
@@ -81,22 +84,19 @@ export const getOwnShiftList = async (userId: string) => {
       },
       user_shifts_table: {
         some: {
-          user_id: userId,
           status: { not: null },
+          user_id: userId,
         },
       },
-    },
-    orderBy: {
-      date_start: 'asc',
     },
   });
   return Array.from(
     data
       .reduce(
-        (acc, { id, status, date_start: dateStart, user_shifts_table }) => {
+        (acc, { date_start: dateStart, id, status, user_shifts_table }) => {
           const shift = acc.get(id) ?? {
-            status,
             dateStart,
+            status,
           };
           for (const userShift of user_shifts_table) {
             if (userId === userShift.user_id) {
@@ -110,9 +110,9 @@ export const getOwnShiftList = async (userId: string) => {
         new Map<
           string,
           {
+            accepted?: boolean | null;
             dateStart: Date;
             status: shift_status;
-            accepted?: boolean | null;
           }
         >()
       )
@@ -121,27 +121,27 @@ export const getOwnShiftList = async (userId: string) => {
 };
 
 export const shiftByDates = async ({
-  dateStart,
   dateEnd,
+  dateStart,
 }: {
-  dateStart: Date;
   dateEnd: Date;
+  dateStart: Date;
 }) => {
   return prisma.shift.findFirst({
-    where: {
-      date_start: dateStart,
-      date_end: dateEnd,
-    },
     include: {
       user_shifts_table: {
         select: {
-          user_id: true,
           status: true,
+          user_id: true,
         },
       },
     },
     orderBy: {
       id: 'desc',
+    },
+    where: {
+      date_end: dateEnd,
+      date_start: dateStart,
     },
   });
 };
@@ -157,8 +157,8 @@ export const shiftByIdAndUser = async ({
     include: {
       user_shifts_table: {
         select: {
-          user_id: true,
           status: true,
+          user_id: true,
         },
         where: {
           user_id: userId,

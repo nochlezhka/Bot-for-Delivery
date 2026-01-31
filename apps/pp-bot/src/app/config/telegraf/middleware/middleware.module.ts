@@ -4,7 +4,7 @@ import { AsyncClsMiddleware } from './async-cls.middleware';
 import { UserMiddleware } from './user-middleware';
 
 @Module({
-  providers: [UserMiddleware, AsyncClsMiddleware, Logger],
   exports: [UserMiddleware, AsyncClsMiddleware],
+  providers: [UserMiddleware, AsyncClsMiddleware, Logger],
 })
 export class MiddlewareModule {}

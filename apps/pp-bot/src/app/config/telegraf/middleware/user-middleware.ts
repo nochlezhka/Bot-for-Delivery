@@ -11,9 +11,9 @@ import { DEFAULT_COMMANDS, USER_COMMANDS } from '../bot-commands';
 
 @Injectable()
 export class UserMiddleware implements MiddlewareObj<TelegrafContext> {
+  @Inject() private readonly appCls!: AppCls;
   @Inject() private readonly logger!: Logger;
   @Inject() private readonly prisma!: PrismaDb;
-  @Inject() private readonly appCls!: AppCls;
 
   middleware(): MiddlewareFn<TelegrafContext> {
     return async (ctx: TelegrafContext, next) => {
@@ -46,8 +46,8 @@ export class UserMiddleware implements MiddlewareObj<TelegrafContext> {
         }
 
         const userScope: BotCommandScopeChat = {
-          type: 'chat',
           chat_id: this.appCls.get('user.tgId'),
+          type: 'chat',
         };
 
         const resultRole = this.appCls.get('user.role');

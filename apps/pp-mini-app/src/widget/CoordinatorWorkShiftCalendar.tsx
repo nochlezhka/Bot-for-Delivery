@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { Dialog, Portal } from '@ark-ui/react';
+import { isDate } from 'date-fns/isDate';
 import { useRef, useState } from 'react';
 
 import { VolunteerShift } from '@/entity/shift/types';
@@ -12,33 +14,43 @@ import {
 
 export function CoordinatorWorkShiftCalendar() {
   const calendarRef = useRef<VolunteerCalendarRef>(null);
-  const [selectedShift, setSelectedShift] = useState<VolunteerShift | null>(
+  const [selectedShift, setSelectedShift] = useState<null | VolunteerShift>(
     null
   );
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedShifts, setSelectedShifts] = useState<VolunteerShift[] | null>(
+  const [selectedShifts, setSelectedShifts] = useState<null | VolunteerShift[]>(
     null
   );
 
   return (
     <>
       <VolunteerShiftDateSelect
+        onChangeValue={(value) => {
+          if (isDate(value)) {
+            setSelectedDate(value);
+          } else if (Array.isArray(value)) {
+            setSelectedShifts(value);
+          } else {
+            setSelectedShift(value);
+          }
+        }}
+        onDateReset={() => {
+          //pass
+        }}
         ref={calendarRef}
-        onChangeValue={(value) => setSelectedDate(value)}
-        onDateReset={() => {}}
       />
       <Dialog.Root
-        skipAnimationOnMount
-        open={selectedShift !== null}
-        modal
         lazyMount
-        unmountOnExit
+        modal
         onOpenChange={({ open }) => {
           if (!open) {
             setSelectedShift(null);
             calendarRef.current?.resetCalendar();
           }
         }}
+        open={selectedShift !== null}
+        skipAnimationOnMount
+        unmountOnExit
       >
         <Portal>
           <Dialog.Positioner className="absolute z-10 flex justify-center items-center">
@@ -47,10 +59,10 @@ export function CoordinatorWorkShiftCalendar() {
                 <></>
               ) : (
                 <VolunteerShiftControl
-                  shift={selectedShift}
                   onActionComplete={() =>
                     calendarRef.current?.resetAndRefresh()
                   }
+                  shift={selectedShift}
                 />
               )}
             </Dialog.Content>

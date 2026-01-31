@@ -9,6 +9,6 @@ declare module '*.svg' {
 
 declare module 'react' {
   interface CSSProperties {
-    [key: `--${string}`]: string | number | undefined;
+    [key: `--${string}`]: number | string | undefined;
   }
 }

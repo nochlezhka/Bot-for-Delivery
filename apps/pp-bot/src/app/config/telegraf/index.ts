@@ -1,2 +1,2 @@
-export * from './config';
 export * from './bot-commands';
+export * from './config';

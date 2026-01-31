@@ -8,8 +8,8 @@ import { api } from '@/trpc/client';
 
 export const AppView = ({ children }: PropsWithChildren) => {
   const {
-    isLoading,
     data: profile,
+    isLoading,
     refetch: refreshProfile,
   } = api.user.profile.useQuery();
 

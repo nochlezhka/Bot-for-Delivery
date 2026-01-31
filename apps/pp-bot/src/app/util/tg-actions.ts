@@ -1,12 +1,12 @@
 export const decodeSubjectAction = (encodedData: string) => {
   const [action, subj] = encodedData.split(':') as [string, string];
   return {
-    subj,
     action,
+    subj,
   };
 };
 export const encodeSubjectAction = (
   subjectAction: string,
-  subject: string | number
+  subject: number | string
 ) => `${subjectAction}:${subject}`;
 export const SubjectWithAction = (subj: string) => new RegExp(`^${subj}:(.+)$`);

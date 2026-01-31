@@ -15,13 +15,13 @@ import { api } from '@/trpc/client';
 const resolver = zodResolver(volunteerShiftSchema);
 
 interface VolunteerShiftFormProps {
-  shift: VolunteerShift;
   onActionComplete?: Noop;
+  shift: VolunteerShift;
 }
 
 export const VolunteerShiftControl = ({
-  shift,
   onActionComplete,
+  shift,
 }: VolunteerShiftFormProps) => {
   const onSuccess = () => onActionComplete && onActionComplete();
 
@@ -35,8 +35,8 @@ export const VolunteerShiftControl = ({
     onSuccess,
   });
   const form = useForm({
-    resolver,
     defaultValues: shift,
+    resolver,
   });
   const submitAction = form.handleSubmit((data) => {
     if ('id' in data) {
@@ -114,8 +114,8 @@ export const VolunteerShiftControl = ({
                 ) : null}
                 <button
                   className="btn btn-md btn-primary"
-                  type="button"
                   onClick={cancelAction}
+                  type="button"
                 >
                   Отменить
                 </button>

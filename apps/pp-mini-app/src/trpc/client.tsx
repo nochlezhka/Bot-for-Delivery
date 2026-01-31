@@ -1,21 +1,21 @@
 'use client';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { retrieveRawInitData } from '@telegram-apps/sdk';
-import { httpBatchLink, loggerLink } from '@trpc/client';
-import { createTRPCReact } from '@trpc/react-query';
-import { Provider } from 'jotai/react';
-import { useHydrateAtoms } from 'jotai/utils';
-import { queryClientAtom } from 'jotai-tanstack-query';
-import { PropsWithChildren, useState } from 'react';
-import superjson from 'superjson';
-
-import { type AppRouter } from '@/server/api/root';
-
 import type {
   QueryClient,
   QueryClientProviderProps,
 } from '@tanstack/react-query';
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+
+import { QueryClientProvider } from '@tanstack/react-query';
+import { retrieveRawInitData } from '@telegram-apps/sdk';
+import { httpBatchLink, loggerLink } from '@trpc/client';
+import { createTRPCReact } from '@trpc/react-query';
+import { queryClientAtom } from 'jotai-tanstack-query';
+import { Provider } from 'jotai/react';
+import { useHydrateAtoms } from 'jotai/utils';
+import { PropsWithChildren, useState } from 'react';
+import superjson from 'superjson';
+
+import { type AppRouter } from '@/server/api/root';
 
 import { createQueryClient } from './app/query-client';
 
@@ -64,13 +64,13 @@ export function TRPCProvider({ children }: Readonly<PropsWithChildren>) {
             (op.direction === 'down' && op.result instanceof Error),
         }),
         httpBatchLink({
-          transformer: superjson,
-          url: getBaseUrl() + '/api/trpc',
           headers: () => {
             const headers = new Headers();
             headers.set('authorization', `tma ${retrieveRawInitData()}`);
             return headers;
           },
+          transformer: superjson,
+          url: getBaseUrl() + '/api/trpc',
         }),
       ],
     })

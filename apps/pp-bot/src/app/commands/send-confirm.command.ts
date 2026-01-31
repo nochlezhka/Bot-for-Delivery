@@ -38,7 +38,7 @@ export class SendConfirmCommandHandler
 {
   @Inject(DEFAULT_BOT_NAME) private readonly bot!: Telegraf;
 
-  async execute({ userTgId, msg, subject, id }: SendConfirmCommand) {
+  async execute({ id, msg, subject, userTgId }: SendConfirmCommand) {
     await this.bot.telegram.sendMessage(
       userTgId,
       msg,

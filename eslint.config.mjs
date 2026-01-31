@@ -38,4 +38,7 @@ export default [
     // Override or add rules here
     rules: {},
   },
+  {
+    ignores: ['**/dist/**', '**/node_modules/**'],
+  },
 ];

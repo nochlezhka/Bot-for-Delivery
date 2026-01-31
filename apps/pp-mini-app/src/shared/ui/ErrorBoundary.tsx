@@ -30,8 +30,8 @@ export class ErrorBoundary extends Component<
 
   override render() {
     const {
+      props: { children, fallback: Fallback },
       state: { error },
-      props: { fallback: Fallback, children },
     } = this;
 
     return error ? <Fallback error={error} /> : children;

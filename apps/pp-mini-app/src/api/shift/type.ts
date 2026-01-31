@@ -1,18 +1,18 @@
-type FreeShiftStatus = 'free';
-export type FreeShift = {
-  status: FreeShiftStatus;
+export type ExistShift = {
   dateStart: Date;
+  id: string;
+  status: ExistShiftStatus;
+};
+export type FreeShift = {
+  dateStart: Date;
+  status: FreeShiftStatus;
 };
 
-type ExistShiftStatus = 'halfBusy' | 'busy' | 'weekend' | 'free';
-export type ExistShift = {
-  id: string;
-  status: ExistShiftStatus;
-  dateStart: Date;
-};
 export type OwnShift = {
+  accepted: boolean | null;
+  dateStart: Date;
   id: string;
   status: ExistShiftStatus;
-  dateStart: Date;
-  accepted: boolean | null;
 };
+type ExistShiftStatus = 'busy' | 'free' | 'halfBusy' | 'weekend';
+type FreeShiftStatus = 'free';

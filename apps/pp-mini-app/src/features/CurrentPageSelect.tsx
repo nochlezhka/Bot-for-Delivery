@@ -23,24 +23,24 @@ const tabListAtom = atom((get) => {
   if (role) {
     result.push(
       {
-        link: '/profile',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
           <User className={className} />
         ),
+        link: '/profile',
         title: 'Профиль',
       },
       {
-        link: '/planned',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
           <BriefcaseBusiness className={className} />
         ),
+        link: '/planned',
         title: 'Дежурства',
       },
       {
-        link: '/',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
           <CalendarSearch className={className} />
         ),
+        link: '/',
         title: 'Календарь',
       }
     );
@@ -48,17 +48,17 @@ const tabListAtom = atom((get) => {
   if (isEmployee) {
     result.unshift(
       {
-        link: '/employee/pp',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
           <Store className={className} />
         ),
+        link: '/employee/pp',
         title: 'Пункты выдачи',
       },
       {
-        link: '/employee/users',
         Icon: ({ className }: Pick<HTMLProps<HTMLElement>, 'className'>) => (
           <Users className={className} />
         ),
+        link: '/employee/users',
         title: 'Пользователи',
       }
     );
@@ -76,9 +76,9 @@ export const CurrentPageSelect = () => {
   return (
     <div className="fab">
       <div
-        tabIndex={0}
-        role="button"
         className="btn btn-lg btn-circle btn-success"
+        role="button"
+        tabIndex={0}
       >
         {currentTab ? (
           <currentTab.Icon className="size-4 shrink-0" />
@@ -86,19 +86,19 @@ export const CurrentPageSelect = () => {
           <TableOfContents className="size-4 shrink-0" />
         )}
       </div>
-      <div role="button" className="fab-main-action btn btn-circle btn-lg">
+      <div className="fab-main-action btn btn-circle btn-lg" role="button">
         <X className="size-4 shrink-0" />
       </div>
       {tabList
         .filter((tab) => tab.link !== currentTab?.link)
         .map((tab, i) => (
           <NextLink
+            className="btn btn-lg btn-circle"
+            href={tab.link}
+            key={`${tab.link}-${i}`}
             onClick={(e) => {
               e.currentTarget.blur();
             }}
-            href={tab.link}
-            className="btn btn-lg btn-circle"
-            key={`${tab.link}-${i}`}
           >
             <tab.Icon className="size-4 shrink-0" />
           </NextLink>

@@ -1,11 +1,11 @@
+import type { shiftCreateManyInput } from 'pickup-point-db/models';
+
 import { HttpService } from '@nestjs/axios';
 import { Inject } from '@nestjs/common';
 import { endOfDay } from 'date-fns/endOfDay';
 import { startOfDay } from 'date-fns/startOfDay';
 import { Command, CommandRunner } from 'nest-commander';
 import { firstValueFrom } from 'rxjs';
-
-import type { shiftCreateManyInput } from 'pickup-point-db/models';
 
 import { PrismaDb } from '../../app/prisma';
 
@@ -14,16 +14,16 @@ type ExpectedResponse = Record<
   string,
   {
     day: string;
-    work: '0' | '1';
     type: string;
+    work: '0' | '1';
     zag: string;
   }
 >;
 
 @Command({ name: 'setup:holidays' })
 export class SetupHolidaysCliCommand extends CommandRunner {
-  @Inject() private readonly http!: HttpService;
   @Inject() private readonly db!: PrismaDb;
+  @Inject() private readonly http!: HttpService;
 
   async run() {
     const response = await firstValueFrom(
@@ -37,9 +37,9 @@ export class SetupHolidaysCliCommand extends CommandRunner {
         const date_start = startOfDay(dayInfo.day);
         const date_end = endOfDay(dayInfo.day);
         data.push({
-          status: 'weekend',
           date_end,
           date_start,
+          status: 'weekend',
           title: dayInfo.zag ?? '',
         });
       }

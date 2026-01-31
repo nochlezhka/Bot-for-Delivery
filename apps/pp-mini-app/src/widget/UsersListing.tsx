@@ -50,8 +50,8 @@ export const UsersListing = ({ className }: UsersListingProps) => {
             <ExistsUserCard
               autoresetOnError
               className="bg-base-100 p-2"
-              key={user.id}
               defaultValues={user}
+              key={user.id}
               onSubmit={(data) => updateUser(merge(data, pick(user, ['id'])))}
             >
               <></>

@@ -35,11 +35,11 @@ export const userRouter = createTRPCRouter({
       if (user) {
         ctx.db.users.create({
           data: {
-            tg_username: user.username,
             gender: input.gender,
             name: [user.last_name, user.first_name].join(' '),
             phone: input.phone,
             tg_id: user.id,
+            tg_username: user.username,
           },
         });
       }
@@ -47,6 +47,11 @@ export const userRouter = createTRPCRouter({
 });
 
 export const userEmployeeRouter = createTRPCRouter({
+  createUser: employeeProcedure
+    .input(createRequestSchema)
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.users.create({ data: input });
+    }),
   getUsers: employeeProcedure
     .input(
       z.object({
@@ -60,10 +65,10 @@ export const userEmployeeRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) =>
       ctx.db.users.findMany({
+        orderBy: { id: 'desc' },
         where: {
           role: input.selected,
         },
-        orderBy: { id: 'desc' },
       })
     ),
   updateUser: employeeProcedure
@@ -77,10 +82,5 @@ export const userEmployeeRouter = createTRPCRouter({
           },
         });
       }
-    }),
-  createUser: employeeProcedure
-    .input(createRequestSchema)
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.users.create({ data: input });
     }),
 });

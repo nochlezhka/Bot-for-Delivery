@@ -1,9 +1,9 @@
 'use client';
+import type { user_role } from 'pickup-point-db/browser';
+
 import { Noop } from '@util/types';
 import { clsx } from 'clsx';
 import { HTMLProps } from 'react';
-
-import type { user_role } from 'pickup-point-db/browser';
 
 import { ROLE_LIST, ROLE_NAMES } from '../constant';
 
@@ -13,9 +13,9 @@ interface RoleChipsProps extends Omit<HTMLProps<HTMLDivElement>, 'onChange'> {
 }
 
 export const RoleChips = ({
+  className,
   defaultSelected,
   onChange,
-  className,
 }: RoleChipsProps) => {
   const selectAciton = (val: user_role) => {
     if (onChange) {
@@ -30,11 +30,11 @@ export const RoleChips = ({
           key={val}
         >
           <input
+            defaultChecked={val === defaultSelected}
+            name="role"
+            onChange={selectAciton.bind(null, val)}
             type="radio"
             value={val}
-            defaultChecked={val === defaultSelected}
-            onChange={selectAciton.bind(null, val)}
-            name="role"
           />
           {ROLE_NAMES[val]}
         </label>

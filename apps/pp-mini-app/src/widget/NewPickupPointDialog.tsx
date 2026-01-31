@@ -21,7 +21,7 @@ export const NewPickupPointDialog = ({
     },
   });
   return (
-    <Dialog.RootProvider value={dialog} lazyMount unmountOnExit>
+    <Dialog.RootProvider lazyMount unmountOnExit value={dialog}>
       <Dialog.Trigger
         className={clsx(
           className,

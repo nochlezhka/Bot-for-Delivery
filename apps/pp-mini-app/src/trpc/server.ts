@@ -17,7 +17,7 @@ export const getQueryClient = cache(createQueryClient);
 const caller = createCallerFactory(appRouter)(createContext);
 
 // noinspection JSUnusedGlobalSymbols
-export const { trpc, HydrateClient } = createHydrationHelpers<AppRouter>(
+export const { HydrateClient, trpc } = createHydrationHelpers<AppRouter>(
   caller,
   getQueryClient
 );

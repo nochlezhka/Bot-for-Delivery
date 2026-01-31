@@ -4,7 +4,7 @@ import metadata from 'libphonenumber-js/min/metadata';
 
 const options = maskitoPhoneOptionsGenerator({
   countryIsoCode: 'RU',
-  strict: true,
   metadata,
+  strict: true,
 });
 export const usePhoneMask = () => useMaskito({ options });

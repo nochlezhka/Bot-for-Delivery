@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { volunteerShiftSchema } from './schema';
 
 export interface ShiftPublicInfo {
+  accepted?: boolean | null;
   id: string;
   status: shift_status;
-  accepted?: boolean | null;
 }
 
 export type ShiftsMap = Map<number, ShiftPublicInfo>;

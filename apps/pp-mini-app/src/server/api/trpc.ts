@@ -1,3 +1,5 @@
+import type { PrismaClient } from 'pickup-point-db/client';
+
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
  * 1. You want to modify request context (see Part 1).
@@ -8,6 +10,8 @@
  */
 import { type InitData, parse, validate } from '@telegram-apps/init-data-node';
 import { initTRPC, TRPCError } from '@trpc/server';
+import console from 'node:console';
+import process from 'node:process';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { users } from 'pickup-point-db/browser';
@@ -16,15 +20,10 @@ import { ZodError } from 'zod';
 
 import { prisma } from '@/server/db';
 
-import type { PrismaClient } from 'pickup-point-db/client';
-
-import console from 'node:console';
-import process from 'node:process';
-
 export interface ContextData {
-  user: null | InitData;
-  dbUser: users | null;
   db: PrismaClient;
+  dbUser: null | users;
+  user: InitData | null;
 }
 
 /**
@@ -72,7 +71,7 @@ export const createTRPCContext = async ({
     default:
       console.error('Unauthorized');
   }
-  return { user, db: prisma, dbUser };
+  return { db: prisma, dbUser, user };
 };
 
 /**
@@ -83,8 +82,7 @@ export const createTRPCContext = async ({
  * errors on the backend.
  */
 const t = initTRPC.context<ContextData>().create({
-  transformer: superjson,
-  errorFormatter({ shape, error }) {
+  errorFormatter({ error, shape }) {
     return {
       ...shape,
       data: {
@@ -94,6 +92,7 @@ const t = initTRPC.context<ContextData>().create({
       },
     };
   },
+  transformer: superjson,
 });
 
 /**
@@ -140,9 +139,9 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
-type Context = Omit<ContextData, 'dbUser'> & {
+type Context = {
   dbUser: users;
-};
+} & Omit<ContextData, 'dbUser'>;
 export const publicProcedure = t.procedure
   .use(timingMiddleware)
   .use<Context>(({ ctx, next }) => {
@@ -162,9 +161,9 @@ export const employeeProcedure = t.procedure
   });
 
 const volunteerAccessibleRoles = new Set([
-  'volunteer',
-  'employee',
   'coordinator',
+  'employee',
+  'volunteer',
 ]);
 export const volunteerProcedure = t.procedure
   .use(timingMiddleware)

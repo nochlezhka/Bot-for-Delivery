@@ -1,4 +1,7 @@
 'use client';
+import type { Noop } from '@util/types';
+import type { project } from 'pickup-point-db/browser';
+
 import { clsx } from 'clsx';
 import { HTMLProps, useMemo } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -8,27 +11,24 @@ import { z } from 'zod';
 import { updateRequestSchema } from '@/api/pickup-point/schema';
 import { updatePickupPointResolver } from '@/entity/pickup-point/resolver';
 
-import type { Noop } from '@util/types';
-import type { project } from 'pickup-point-db/browser';
-
 import { PickupPointFormContext } from '../Context';
-
-type formData = project;
-type formResult = z.infer<typeof updateRequestSchema>;
 
 export interface EditFormProviderProps
   extends Omit<HTMLProps<HTMLDivElement>, 'onSubmit'> {
-  onSubmit?: (data: formResult) => ReturnType<Noop>;
-  defaultValues?: formData;
   autoresetOnError?: boolean;
+  defaultValues?: formData;
+  onSubmit?: (data: formResult) => ReturnType<Noop>;
 }
+type formData = project;
+
+type formResult = z.infer<typeof updateRequestSchema>;
 
 export const EditFormProvider = ({
+  autoresetOnError,
+  children,
   className,
   defaultValues,
   onSubmit,
-  children,
-  autoresetOnError,
 }: EditFormProviderProps) => {
   const form = useForm({
     defaultValues,

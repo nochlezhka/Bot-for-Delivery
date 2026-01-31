@@ -1,17 +1,17 @@
 'use client';
+import type { users } from 'pickup-point-db/browser';
+
 import { Editable } from '@ark-ui/react/editable';
 import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { useTgLinkMask } from '@/entity/user/hooks/use-tg-link.mask';
 
-import type { users } from 'pickup-point-db/browser';
-
 import { UserFormContext } from '../../Context';
 
 export const TgUseranmeField = () => {
   const { control } = useFormContext<users>();
-  const { field, fieldState } = useController({ name: 'tg_username', control });
+  const { field, fieldState } = useController({ control, name: 'tg_username' });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);
   const maskedInput = useTgLinkMask();
@@ -21,15 +21,15 @@ export const TgUseranmeField = () => {
       <legend className="fieldset-legend">TgUsername</legend>
       <Editable.Root
         className="form-control"
-        placeholder="Введите ссылку на пользователя"
         defaultValue={field.value ?? ''}
-        onValueCommit={trigerFieldSubmit.bind(null, 'tg_username')}
         onValueChange={({ value }) => field.onChange(value)}
+        onValueCommit={trigerFieldSubmit.bind(null, 'tg_username')}
+        placeholder="Введите ссылку на пользователя"
       >
         <Editable.Preview className="input input-bordered w-full data-[placeholder-shown]:text-base-content/30" />
         <Editable.Input
-          ref={maskedInput}
           className="input input-bordered w-full"
+          ref={maskedInput}
         />
       </Editable.Root>
       {fieldState.error?.message ? (

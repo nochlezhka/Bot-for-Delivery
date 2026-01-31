@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const shiftRangeRequest = z.object({
-  taskId: z.string().uuid(),
-  start: z.date().optional(),
   end: z.date().optional(),
+  start: z.date().optional(),
+  taskId: z.string().uuid(),
 });
 
 export const shiftSignUpRequest = z.object({

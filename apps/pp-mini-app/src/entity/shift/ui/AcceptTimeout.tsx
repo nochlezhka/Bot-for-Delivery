@@ -1,19 +1,19 @@
 import { Info } from 'lucide-react';
 
-import { ShiftTimer } from './ShiftTimer';
 import { acceptAvailableDate, isAcceptAvailable } from '../util';
+import { ShiftTimer } from './ShiftTimer';
 
 interface AcceptTimeoutProps {
-  isAccepted?: boolean | null;
   dateStart: Date;
+  isAccepted?: boolean | null;
 }
 
 const getStartMs = (dateStart: Date) =>
   dateStart.getTime() - new Date().getTime();
 
 export const AcceptTimeout = ({
-  isAccepted,
   dateStart,
+  isAccepted,
 }: AcceptTimeoutProps) => {
   let result = <></>;
 

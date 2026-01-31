@@ -1,16 +1,16 @@
 'use client';
+import type { users } from 'pickup-point-db/browser';
+
 import { useContext } from 'react';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { RoleSelect } from '@/entity/employee/ui';
 
-import type { users } from 'pickup-point-db/browser';
-
 import { UserFormContext } from '../../Context';
 
 export const RoleField = () => {
   const { control } = useFormContext<users>();
-  const { field, fieldState } = useController({ name: 'role', control });
+  const { field, fieldState } = useController({ control, name: 'role' });
 
   const { trigerFieldSubmit } = useContext(UserFormContext);
 

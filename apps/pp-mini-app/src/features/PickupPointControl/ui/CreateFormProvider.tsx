@@ -1,4 +1,6 @@
 'use client';
+import type { Noop } from '@util/types';
+
 import { clsx } from 'clsx';
 import { project } from 'pickup-point-db/client';
 import { HTMLProps, useMemo } from 'react';
@@ -9,28 +11,26 @@ import z from 'zod';
 import { createRequestSchema } from '@/api/pickup-point/schema';
 import { createPickupPointResolver } from '@/entity/pickup-point/resolver';
 
-import type { Noop } from '@util/types';
-
 import { PickupPointFormContext } from '../Context';
-
-type formData = project;
-type formResult = z.infer<typeof createRequestSchema>;
 
 export interface CreateFormProviderProps
   extends Omit<HTMLProps<HTMLDivElement>, 'onSubmit'> {
-  onSubmit?: (data: formResult) => ReturnType<Noop>;
   defaultValues?: Partial<formData>;
+  onSubmit?: (data: formResult) => ReturnType<Noop>;
 }
+type formData = project;
+
+type formResult = z.infer<typeof createRequestSchema>;
 
 export const CreateFormProvider = ({
-  defaultValues,
-  onSubmit,
   children,
   className,
+  defaultValues,
+  onSubmit,
 }: CreateFormProviderProps) => {
   const form = useForm({
-    resolver: createPickupPointResolver,
     defaultValues: defaultValues as formResult,
+    resolver: createPickupPointResolver,
   });
   const submitAction = useMemo(
     () => form.handleSubmit((data) => onSubmit?.(data)),

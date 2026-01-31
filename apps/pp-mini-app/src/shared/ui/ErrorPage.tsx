@@ -4,7 +4,7 @@ export function ErrorPage({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
+  error: { digest?: string } & Error;
   reset?: () => void;
 }) {
   useEffect(() => {

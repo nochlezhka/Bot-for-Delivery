@@ -6,9 +6,9 @@ import { createTRPCContext } from '@/server/api/trpc';
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
+    createContext: () => createTRPCContext({ headers: req.headers }),
     endpoint: '/api/trpc',
     req,
     router: appRouter,
-    createContext: () => createTRPCContext({ headers: req.headers }),
   });
 export { handler as GET, handler as POST };

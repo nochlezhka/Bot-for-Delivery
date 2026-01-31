@@ -6,8 +6,8 @@ export const REQUEST_CONTACT_KEYBOARD = {
     keyboard: [
       [
         {
-          text: '📲 Поделиться номером телефона',
           request_contact: true,
+          text: '📲 Поделиться номером телефона',
         },
       ],
     ],
@@ -19,8 +19,8 @@ export const REQUEST_GENDER_KEYBOARD = {
   reply_markup: {
     inline_keyboard: [
       [
-        { text: 'Мужчина', callback_data: 'male' },
-        { text: 'Женщина', callback_data: 'female' },
+        { callback_data: 'male', text: 'Мужчина' },
+        { callback_data: 'female', text: 'Женщина' },
       ],
     ],
   },

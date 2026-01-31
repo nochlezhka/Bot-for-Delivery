@@ -10,12 +10,12 @@ export class AppCls extends ClsService<AppClsStore> {}
 
 @Global()
 @Module({
+  exports: [AppCls],
   providers: [
     {
       provide: AppCls,
       useExisting: ClsService,
     },
   ],
-  exports: [AppCls],
 })
 export class AppClsModule {}
