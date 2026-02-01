@@ -1,56 +1,47 @@
 'use client';
 
-import { Dialog, Portal } from '@ark-ui/react';
-import { useRef, useState } from 'react';
+import { action } from '@reatom/core';
+import { useAction } from '@reatom/react';
+import { isDate } from 'date-fns/isDate';
+import { useRef } from 'react';
 
-import { VolunteerShift } from '@/entity/shift/types';
-import { VolunteerShiftControl } from '@/features/VolunteerShiftControl';
+import { VolunteerShift } from '@/entity/shift';
+import {
+  VolunteerShiftControlDialog,
+  volunterControllingShift,
+} from '@/features/VolunteerShiftControl';
 import {
   VolunteerCalendarRef,
   VolunteerShiftDateSelect,
 } from '@/features/VolunteerShiftDateSelect';
+import { ToastError } from '@/shared/ui/Toaster';
 
-export function VolunteerWorkShiftCalendar() {
+const setControllingShift = action((value: Date | VolunteerShift[]) => {
+  if (isDate(value)) {
+    volunterControllingShift.setupShift({
+      accepted: undefined,
+      dateStart: value,
+    });
+  } else if (Array.isArray(value)) {
+    ToastError({ text: 'Неожиданая ошибка, сообщите координатору!' });
+  } else {
+    volunterControllingShift.setupShift(value);
+  }
+});
+
+export const VolunteerWorkShiftCalendar = () => {
   const calendarRef = useRef<VolunteerCalendarRef>(null);
-  const [selectedShift, setSelectedShift] = useState<null | VolunteerShift>(
-    null
-  );
+  const setControllingShiftAction = useAction(setControllingShift);
+
   return (
     <>
       <VolunteerShiftDateSelect
-        onChangeValue={(value) => setSelectedShift(value)}
-        onDateReset={() => setSelectedShift(null)}
+        onChangeValue={setControllingShiftAction}
         ref={calendarRef}
       />
-      <Dialog.Root
-        lazyMount
-        modal
-        onOpenChange={({ open }) => {
-          if (!open) {
-            calendarRef.current?.resetCalendar();
-          }
-        }}
-        open={selectedShift !== null}
-        unmountOnExit
-      >
-        <Portal>
-          <Dialog.Positioner className="absolute z-10 flex justify-center items-center">
-            <Dialog.Content className="flex bg-base-100 text-primary-content p-5 rounded-lg">
-              {selectedShift === null ? (
-                <></>
-              ) : (
-                <VolunteerShiftControl
-                  onActionComplete={() =>
-                    calendarRef.current?.resetAndRefresh()
-                  }
-                  shift={selectedShift}
-                />
-              )}
-            </Dialog.Content>
-          </Dialog.Positioner>
-          <Dialog.Backdrop className="fixed size-full bg-black/50" />
-        </Portal>
-      </Dialog.Root>
+      <VolunteerShiftControlDialog
+        onClose={() => calendarRef.current?.resetCalendar()}
+      />
     </>
   );
-}
+};

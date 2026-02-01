@@ -17,8 +17,8 @@ export interface VolunteerCalendarRef {
 }
 
 interface VolunteerCalendarProps extends HTMLProps<VolunteerCalendarRef> {
-  onChangeValue: (date: Date | VolunteerShift[]) => ReturnType<Noop>;
-  onDateReset: Noop;
+  onChangeValue?: (date: Date | VolunteerShift[]) => ReturnType<Noop>;
+  onDateReset?: Noop;
 }
 
 export const VolunteerShiftDateSelect: FC<VolunteerCalendarProps> = ({
@@ -29,12 +29,12 @@ export const VolunteerShiftDateSelect: FC<VolunteerCalendarProps> = ({
   const { datePicker, dateRange, resetCalendar } =
     TelegramCalendar.useDatepicker({
       isDateUnavailable: (date: Date) => {
-        return !calendarShiftMap.has(shiftKeyByDate(date));
+        return false;
       },
       maxDate: endOfMonth(addMonths(new Date(), 1)),
       onChangeValue: (date) => {
         const shifts = calendarShiftMap.get(shiftKeyByDate(date));
-        onChangeValue(shifts ?? date);
+        onChangeValue?.(shifts ?? date);
       },
       onDateReset,
     });

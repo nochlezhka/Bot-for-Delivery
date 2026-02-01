@@ -16,7 +16,7 @@ const resolver = zodResolver(volunteerShiftSchema);
 
 interface VolunteerShiftFormProps {
   onActionComplete?: Noop;
-  shift: VolunteerShift;
+  shift?: VolunteerShift | null;
 }
 
 export const VolunteerShiftControl = ({
@@ -35,7 +35,7 @@ export const VolunteerShiftControl = ({
     onSuccess,
   });
   const form = useForm({
-    defaultValues: shift,
+    defaultValues: shift as VolunteerShift,
     resolver,
   });
   const submitAction = form.handleSubmit((data) => {

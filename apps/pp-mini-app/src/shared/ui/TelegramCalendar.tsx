@@ -92,8 +92,8 @@ export const CURRENT_TZ = 'Europe/Moscow';
 interface UseTelegramCalendarProps {
   isDateUnavailable?: (date: Date) => boolean;
   maxDate?: Date;
-  onChangeValue: (date: Date) => ReturnType<Noop>;
-  onDateReset: Noop;
+  onChangeValue?: (date: Date) => ReturnType<Noop>;
+  onDateReset?: Noop;
 }
 
 TelegramCalendar.useDatepicker = ({
@@ -119,9 +119,9 @@ TelegramCalendar.useDatepicker = ({
     onValueChange: async ({ value }: ValueChangeDetails) => {
       const selectedDate = value[0];
       if (selectedDate) {
-        await onChangeValue(selectedDate.toDate(CURRENT_TZ));
+        await onChangeValue?.(selectedDate.toDate(CURRENT_TZ));
       } else {
-        await onDateReset();
+        await onDateReset?.();
       }
     },
     open: true,
