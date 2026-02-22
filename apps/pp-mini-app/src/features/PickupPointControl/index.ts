@@ -1,2 +1,1 @@
-export * from './ui/NewPickupPointCard';
-export * from './ui/UpdatePickupPointCard';
+export * from './ui/NewTaskForm';

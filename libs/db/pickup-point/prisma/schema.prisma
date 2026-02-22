@@ -15,23 +15,24 @@ datasource db {
   provider = "postgresql"
 }
 
-model project {
-  id           String         @id @default(uuid(7)) @db.Uuid
-  name         String         @db.VarChar(64)
-  address      String?
-  description  String?
-  users        users[]
-  projectTasks project_task[]
+model task {
+  id              String          @id @default(uuid(7)) @db.Uuid
+  name            String          @db.VarChar(64)
+  address         String?
+  description     String?
+  max_participant Int             @default(2) @db.SmallInt
+  users           users[]
+  schedules       task_schedule[]
 }
 
-model project_task {
-  id         String       @id @default(uuid(7)) @db.Uuid
-  name       String       @db.VarChar(64)
-  is_active  Boolean      @default(true)
-  schedule   String
-  gender     user_gender?
-  project_id String       @db.Uuid
-  project    project      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model task_schedule {
+  id        String       @id @default(uuid(7)) @db.Uuid
+  name      String       @db.VarChar(64)
+  is_active Boolean      @default(true)
+  schedule  String
+  gender    user_gender?
+  task_id   String       @db.Uuid
+  task      task         @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model shift {
@@ -66,7 +67,7 @@ model users {
   role              user_role           @default(guest)
   project_id        String?             @db.Uuid
   user_shifts_table user_shifts_table[]
-  project           project?            @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_pickup_id_pickup_point_id_fk")
+  task              task?               @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_pickup_id_pickup_point_id_fk")
 }
 
 enum shift_status {

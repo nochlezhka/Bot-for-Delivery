@@ -133,13 +133,13 @@ const shiftsRouter = createTRPCRouter({
   getTaskShifts: volunteerProcedure
     .input(shiftRangeRequest)
     .query(async ({ ctx, input: { end, start, taskId } }) => {
-      const task = await prisma.project_task.findUniqueOrThrow({
+      const task = await prisma.task_schedule.findMany({
         where: {
-          id: taskId,
+          task_id: taskId,
         },
       });
 
-      let schedule: null | RRule = null;
+      /*let schedule: null | RRule = null;
       if (task.is_active) {
         if (task.gender === null || task.gender === ctx.dbUser.gender) {
           schedule = rrulestr(task.schedule);
@@ -210,7 +210,8 @@ const shiftsRouter = createTRPCRouter({
             status: 'free',
           } satisfies FreeShift)
         );
-      }
+      }*/
+      const result = new Map<any, any>();
       return Array.from(result.entries());
     }),
   signUp: volunteerProcedure

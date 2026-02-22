@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 export const projectTaskSchema = z.object({
-  gender: z.enum(['male', 'female']).nullable().optional(),
+  gender: z.enum(['male', 'female']).nullable(),
   is_active: z.boolean().default(true),
-  name: z.string({ message: 'Необходимо указать Наименование задачи' }),
   schedule: z.string({ message: 'Необходимо указать Расписание (RRULE)' }),
 });
 export const projectSchema = z.object({
   address: z.string({ message: 'Необходимо указать Адрес' }).nullable(),
   description: z.string({ message: 'Необходимо указать Описание' }).nullable(),
+  max_participant: z.number().default(2),
   name: z.string({ message: 'Необходимо указать Наименовнаие' }),
 });
 

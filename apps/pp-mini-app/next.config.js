@@ -9,6 +9,14 @@ const nextConfig = {
   },
 
   output: 'standalone',
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ignored: ['**/node_modules/**', '**/.git/**', '**/dist/**'],
+      };
+    }
+    return config;
+  },
 };
 
 const { composePlugins, withNx } = require('@nx/next');

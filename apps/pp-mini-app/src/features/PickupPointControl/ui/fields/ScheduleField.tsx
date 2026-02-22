@@ -1,9 +1,9 @@
 'use client';
-import type { project_task } from 'pickup-point-db/browser';
-
-import { ChangeEvent, useState } from 'react';
-import { useController, useFormContext } from 'react-hook-form';
-import { entries, merge } from 'remeda';
+import { bind, reatomField, wrap } from '@reatom/core';
+import { reatomComponent } from '@reatom/react';
+import clsx from 'clsx';
+import { ChangeEvent, HTMLProps } from 'react';
+import { clone, entries, merge } from 'remeda';
 import { ALL_WEEKDAYS, RRule, Weekday } from 'rrule';
 import { Frequency } from 'rrule/dist/esm/types';
 import { WeekdayStr } from 'rrule/dist/esm/weekday';
@@ -14,8 +14,8 @@ const defaultSchedule: SchedulerVal = {
   MO: true,
   SA: false,
   SU: false,
-  TH: false,
-  TU: false,
+  TH: true,
+  TU: true,
   WE: true,
 };
 const emptySchedule: SchedulerVal = {
@@ -37,7 +37,7 @@ const weekdayDict: Record<WeekdayStr, string> = {
   WE: 'Ср',
 };
 const dayNames = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'] as WeekdayStr[];
-const scheduleToString = (v: SchedulerVal) => {
+export const scheduleToString = (v: SchedulerVal): string => {
   const rule = new RRule({
     byweekday: Array.from(entries(v)).reduce((res, [key, val]) => {
       if (val) {
@@ -49,7 +49,7 @@ const scheduleToString = (v: SchedulerVal) => {
   });
   return rule.toString();
 };
-const stringToSchedule = (rruleString: string) => {
+export const stringToSchedule = (rruleString: string): SchedulerVal => {
   const rule = RRule.fromString(rruleString);
   const weekdays = rule.options.byweekday || [];
 
@@ -59,52 +59,59 @@ const stringToSchedule = (rruleString: string) => {
   );
 };
 
-export const ScheduleField = () => {
-  const { control } = useFormContext<project_task>();
-  const { field, fieldState } = useController({
-    control,
-    defaultValue: scheduleToString(defaultSchedule),
-    name: 'schedule',
-  });
-  const [weekdayActivity, setWeekdayActivity] = useState(
-    field.value ? stringToSchedule(field.value) : defaultSchedule
+export const createDefaultSchedule = () => scheduleToString(defaultSchedule);
+
+export const createScheduleFiled = (schedule?: string) =>
+  reatomField<SchedulerVal, string>(
+    schedule ? stringToSchedule(schedule) : clone(defaultSchedule),
+    {
+      fromState: scheduleToString,
+      toState: stringToSchedule,
+    }
   );
 
-  const scheduledDayToggleAction = (e: ChangeEvent<HTMLInputElement>) => {
-    const res = merge(weekdayActivity, {
-      [e.currentTarget.value]: e.currentTarget.checked,
-    } as SchedulerVal);
-    setWeekdayActivity(res);
-    field.onChange(scheduleToString(res));
-  };
-  return (
-    <fieldset className="fieldset">
-      <legend className="fieldset-legend">Расписание</legend>
-      <div className="form-control flex gap-2 flex-wrap">
-        {ALL_WEEKDAYS.map((day) => (
-          <label
-            className="flex bg-slate-300 has-checked:bg-primary p-2 rounded-full cursor-pointer size-8"
-            key={day}
-          >
-            <input
-              checked={weekdayActivity[day] ?? false}
-              className="sr-only peer"
-              name={`schedule-${day}-activity`}
-              onChange={scheduledDayToggleAction}
-              type="checkbox"
-              value={day}
-            />
-            <span className="text-white peer-checked:text-primary-content!">
-              {weekdayDict[day]}
-            </span>
-          </label>
-        ))}
-      </div>
-      {fieldState.error?.message ? (
-        <div className="text-error">{fieldState.error.message}</div>
-      ) : (
-        <></>
-      )}
-    </fieldset>
-  );
-};
+type FieldAtom = ReturnType<typeof createScheduleFiled>;
+
+interface ScheduleFieldProps extends HTMLProps<HTMLDivElement> {
+  schedule: FieldAtom;
+}
+
+export const ScheduleField = reatomComponent(
+  ({ className, schedule }: ScheduleFieldProps) => {
+    return (
+      <fieldset className={clsx('fieldset', className)}>
+        <legend className="fieldset-legend sr-only">Неделя расписания</legend>
+        <div className="form-control flex gap-2 flex-wrap">
+          {ALL_WEEKDAYS.map((day) => (
+            <label
+              className="flex bg-slate-300 has-checked:bg-primary p-2 rounded-full cursor-pointer size-8 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent-content"
+              key={day}
+            >
+              <input
+                checked={schedule()[day] ?? false}
+                className="sr-only peer"
+                name={`schedule-${day}-activity`}
+                onChange={bind((e: ChangeEvent<HTMLInputElement>) => {
+                  const res = merge(schedule(), {
+                    [e.currentTarget.value]: e.currentTarget.checked,
+                  } as SchedulerVal);
+                  return wrap(schedule.set(res));
+                })}
+                type="checkbox"
+                value={day}
+              />
+              <span className="text-white peer-checked:text-primary-content! whitespace-nowrap break-keep">
+                {weekdayDict[day]}
+              </span>
+            </label>
+          ))}
+        </div>
+        {schedule.validation().triggered && schedule.validation().error ? (
+          <div className="text-error">{schedule.validation().error}</div>
+        ) : (
+          <></>
+        )}
+      </fieldset>
+    );
+  }
+);

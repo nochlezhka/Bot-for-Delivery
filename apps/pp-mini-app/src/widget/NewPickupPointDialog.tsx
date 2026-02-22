@@ -5,9 +5,11 @@ import { clsx } from 'clsx';
 import { HousePlus } from 'lucide-react';
 import { HTMLProps } from 'react';
 
-import { NewPickupPointCard } from '@/features/PickupPointControl';
+import { NewTaskForm } from '@/features/PickupPointControl';
 import { ToastSuccess } from '@/shared/ui/Toaster';
 import { api } from '@/trpc/client';
+
+const DEFAULT_VALUES = { name: 'Пункт выдачи ночлежки' };
 
 export const NewPickupPointDialog = ({
   className,
@@ -20,6 +22,7 @@ export const NewPickupPointDialog = ({
       dialog.setOpen(false);
     },
   });
+
   return (
     <Dialog.RootProvider lazyMount unmountOnExit value={dialog}>
       <Dialog.Trigger
@@ -34,8 +37,8 @@ export const NewPickupPointDialog = ({
       <Portal>
         <Dialog.Positioner className="modal modal-open justify-center items-center">
           <Dialog.Content className="modal-box pt-3">
-            <NewPickupPointCard
-              defaultValues={{ name: 'Пункт выдачи ночлежки' }}
+            <NewTaskForm
+              defaultValues={DEFAULT_VALUES}
               onSubmit={(data) => {
                 mutate(data);
               }}

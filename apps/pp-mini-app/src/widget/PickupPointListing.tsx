@@ -3,9 +3,7 @@ import { getQueryKey } from '@trpc/react-query';
 import { clsx } from 'clsx';
 import { CircleAlert } from 'lucide-react';
 import { HTMLProps } from 'react';
-import { merge, pick } from 'remeda';
 
-import { UpdatePickupPointCard } from '@/features/PickupPointControl';
 import { ToastSuccess } from '@/shared/ui/Toaster';
 import { api } from '@/trpc/client';
 
@@ -14,16 +12,15 @@ export const PickupPointListing = ({ className }: UsersListingProps) => {
   const [data, { refetch }] = api.eployee.pp.getList.useSuspenseQuery();
 
   const queryClient = useQueryClient();
-  const { mutateAsync: updatePickuppoint } =
-    api.eployee.pp.updateOne.useMutation({
-      onSuccess: async () => {
-        ToastSuccess({ text: 'Пункт выдачи обновлен!' });
-        await refetch();
-        await queryClient.invalidateQueries({
-          queryKey: getQueryKey(api.eployee.pp.getList, undefined, 'query'),
-        });
-      },
-    });
+  const _ = api.eployee.pp.updateOne.useMutation({
+    onSuccess: async () => {
+      ToastSuccess({ text: 'Пункт выдачи обновлен!' });
+      await refetch();
+      await queryClient.invalidateQueries({
+        queryKey: getQueryKey(api.eployee.pp.getList, undefined, 'query'),
+      });
+    },
+  });
 
   let result = <></>;
   if (data) {
@@ -35,26 +32,8 @@ export const PickupPointListing = ({ className }: UsersListingProps) => {
         </div>
       );
     } else {
-      result = (
-        <div className="w-full grow flex flex-col gap-8">
-          {data.map((pickuppoint) => (
-            <UpdatePickupPointCard
-              autoresetOnError
-              className="bg-base-100 p-2"
-              defaultValues={pickuppoint}
-              key={pickuppoint.id}
-              onSubmit={(data) =>
-                updatePickuppoint(merge(data, pick(pickuppoint, ['id'])))
-              }
-            >
-              <></>
-            </UpdatePickupPointCard>
-          ))}
-        </div>
-      );
+      //pass
     }
   }
-  return (
-    <div className={clsx(className, 'h-full flex flex-grow')}>{result}</div>
-  );
+  return <div className={clsx(className, 'h-full flex grow')}>{result}</div>;
 };
