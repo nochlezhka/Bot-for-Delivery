@@ -8,7 +8,7 @@ import { ToastSuccess } from '@/shared/ui/Toaster';
 import { api } from '@/trpc/client';
 
 type UsersListingProps = HTMLProps<HTMLDivElement>;
-export const PickupPointListing = ({ className }: UsersListingProps) => {
+export const TaskListing = ({ className }: UsersListingProps) => {
   const [data, { refetch }] = api.eployee.pp.getList.useSuspenseQuery();
 
   const queryClient = useQueryClient();
