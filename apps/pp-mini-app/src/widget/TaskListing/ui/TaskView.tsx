@@ -2,8 +2,9 @@ import { reatomComponent } from '@reatom/react';
 import { Noop } from '@util/types';
 import { Calendar, FileText, MapPin, Pencil, Users } from 'lucide-react';
 
+import { GenderIcon } from '@/entity/task/ui/GenderIcon';
+import { GenderName } from '@/entity/task/ui/GenderName';
 import { ScheduleView } from '@/entity/task/ui/ScheduleView';
-import { GENDER_NAMES } from '@/entity/user/constant';
 
 import { Task } from '../model/taskModel';
 
@@ -45,7 +46,7 @@ export const TaskView = reatomComponent<TaskViewProps>(({ onClick, task }) => {
           </div>
 
           {task.schedules && task.schedules.length > 0 && (
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 space-y-3 w-full">
               <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
                 Расписание
@@ -56,7 +57,15 @@ export const TaskView = reatomComponent<TaskViewProps>(({ onClick, task }) => {
                   key={schedule.id}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm">{schedule.name}</span>
+                    <div className="flex gap-1">
+                      <span className="font-medium text-sm">
+                        {schedule.name}
+                      </span>
+                      <div className="flex items-center gap-1 text-xs text-gray-500 lowercase">
+                        <GenderIcon gender={schedule.gender} />
+                        <GenderName gender={schedule.gender} />
+                      </div>
+                    </div>
                     <span
                       className={`badge badge-sm ${
                         schedule.is_active ? 'badge-success' : 'badge-ghost'
@@ -66,11 +75,6 @@ export const TaskView = reatomComponent<TaskViewProps>(({ onClick, task }) => {
                     </span>
                   </div>
                   <ScheduleView schedule={schedule.schedule} />
-                  {schedule.gender && (
-                    <div className="text-xs text-gray-500">
-                      Пол: {GENDER_NAMES[schedule.gender]}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
