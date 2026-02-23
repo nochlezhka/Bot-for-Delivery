@@ -5,6 +5,12 @@
       "type": "local",
       "command": ["ctx", "server"],
       "enabled": true
+    },
+
+    "lucide-icons": {
+      "type": "local",
+      "command": ["npx", "lucide-icons-mcp", "--stdio"],
+      "enabled": true
     }
   }
 }
