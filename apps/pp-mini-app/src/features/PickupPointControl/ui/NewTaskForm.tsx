@@ -9,6 +9,7 @@ import { map, merge, pipe } from 'remeda';
 import { z } from 'zod';
 
 import { createRequestSchema } from '@/api/pickup-point/schema';
+import { scheduleToString } from '@/api/task/util';
 import { NumberField } from '@/shared/ui/fields/NumberField';
 import { TextAreaField } from '@/shared/ui/fields/TextAreaField';
 import { TextField } from '@/shared/ui/fields/TextField';
@@ -17,7 +18,6 @@ import {
   createDefaultSchedule,
   createScheduleFiled,
   ScheduleField,
-  scheduleToString,
 } from './fields';
 
 export interface CreateFormProviderProps

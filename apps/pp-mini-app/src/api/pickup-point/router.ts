@@ -24,7 +24,10 @@ export const pickupPointEmployeeRouter = createTRPCRouter({
       });
     }),
   getList: employeeProcedure.query(async ({ ctx }) =>
-    ctx.db.task.findMany({ orderBy: { id: 'desc' } })
+    ctx.db.task.findMany({
+      orderBy: { id: 'desc' },
+      include: { schedules: true },
+    })
   ),
   updateOne: employeeProcedure
     .input(updateRequestSchema)

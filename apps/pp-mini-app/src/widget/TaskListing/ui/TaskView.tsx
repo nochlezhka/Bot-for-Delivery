@@ -1,6 +1,9 @@
 import { reatomComponent } from '@reatom/react';
 import { Noop } from '@util/types';
-import { FileText, MapPin, Pencil, Users } from 'lucide-react';
+import { Calendar, FileText, MapPin, Pencil, Users } from 'lucide-react';
+
+import { ScheduleView } from '@/entity/task/ui/ScheduleView';
+import { GENDER_NAMES } from '@/entity/user/constant';
 
 import { Task } from '../model/taskModel';
 
@@ -40,6 +43,38 @@ export const TaskView = reatomComponent<TaskViewProps>(({ onClick, task }) => {
               <span>Макс. участников: {task.max_participant}</span>
             </div>
           </div>
+
+          {task.schedules && task.schedules.length > 0 && (
+            <div className="mt-4 space-y-3">
+              <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Расписание
+              </h4>
+              {task.schedules.map((schedule) => (
+                <div
+                  className="bg-gray-50 rounded-lg p-3 space-y-2"
+                  key={schedule.id}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-sm">{schedule.name}</span>
+                    <span
+                      className={`badge badge-sm ${
+                        schedule.is_active ? 'badge-success' : 'badge-ghost'
+                      }`}
+                    >
+                      {schedule.is_active ? 'Активно' : 'Не активно'}
+                    </span>
+                  </div>
+                  <ScheduleView schedule={schedule.schedule} />
+                  {schedule.gender && (
+                    <div className="text-xs text-gray-500">
+                      Пол: {GENDER_NAMES[schedule.gender]}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <button className="btn btn-sm btn-primary shrink-0" onClick={onClick}>
           <Pencil className="h-4 w-4 mr-1" />
